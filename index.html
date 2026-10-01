@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="description" content="Jaime Sánchez — portfolio creativo. Diseño y desarrollo web. Málaga, España." />
+  <title>Jaime® · Portfolio creativo</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="./favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+
+  <header class="nav" id="nav">
+    <a class="nav-logo" href="#top">Jaime<sup>®</sup></a>
+    <nav class="nav-links" aria-label="Navegación principal">
+      <a href="#trabajos">Proyectos</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#ia">IA</a>
+      <a href="#sobre-mi">Sobre mí</a>
+      <a href="#curriculum">Currículum</a>
+    </nav>
+    <button class="nav-cta magnetic" type="button" data-open-chat>Hablemos</button>
+  </header>
+
+  <main>
+    <!-- Cabecera que solo aparece al imprimir / guardar el CV en PDF -->
+    <div class="print-head" aria-hidden="true">
+      <p class="print-name">Jaime Sánchez</p>
+      <p>Diseño y desarrollo web · Málaga, España</p>
+      <!-- CAMBIAR: añade el dominio de Railway cuando lo tengas -->
+      <p>jaimesnchz9966@gmail.com</p>
+    </div>
+
+    <!-- ——— Hero ——— -->
+    <section class="hero" id="top">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-3d" id="hero3d" aria-hidden="true">
+        <canvas id="blob"></canvas>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="line">
+          <span><span class="rotator" id="rotator">Auténtico</span><sup>®</sup></span>
+        </span>
+        <span class="line"><span>Portfolio <em>creativo</em></span></span>
+      </h1>
+
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="label">Basado en</span>
+          <span>Málaga, España · Remoto</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="label">Especialidad</span>
+          <span>Diseño web · Desarrollo · Interfaces</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="label">Estado</span>
+          <span class="status">Disponible para proyectos</span>
+        </div>
+        <button class="hero-scroll magnetic" id="scrollBtn" type="button">
+          <span>Ver trabajos</span>
+          <span class="arr">↓</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ——— Anillo 3D de servicios ——— -->
+    <section class="ring" id="ring">
+      <div class="ring-side">
+        <span class="label">Lo que hago</span>
+        <p class="ring-hint">Arrastra para girar</p>
+      </div>
+      <div class="ring-stage" id="ringStage">
+        <div class="ring-drum" id="ringDrum"></div>
+      </div>
+    </section>
+
+    <!-- ——— Trabajos ——— -->
+    <section class="work" id="trabajos">
+      <div class="work-head">
+        <h2 class="section-title">Trabajos</h2>
+        <p class="work-hint">Cada ventana es la web real funcionando</p>
+      </div>
+
+      <!--
+        Para añadir o cambiar un proyecto, copia un bloque <a class="case"> y toca:
+          href       → la página de proceso (./projects/x.html) o la web directa
+          data-src   → la URL que se carga dentro de la ventana
+          data-tint  → color del proyecto (brillo al pasar por encima)
+          .case-url  → el texto que se lee en la barra de la ventana
+          .case-index / .case-name / .case-tags / .case-year
+        La ventana siempre enseña la web real en vivo: si la actualizas, aquí se
+        actualiza sola. Si una web se cae, el hueco sale en negro.
+      -->
+      <div class="cases" id="cases">
+        <a class="case reveal" href="./projects/phobia.html" data-src="https://prinzip96.github.io/PHOBIA/index.html" data-tint="#ff4fd8">
+          <div class="case-window">
+            <div class="case-bar">
+              <span class="case-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="case-url">prinzip96.github.io/PHOBIA</span>
+            </div>
+            <div class="case-media">
+              <div class="case-scroll"><iframe title="Phobia" tabindex="-1" loading="lazy"></iframe></div>
+              <span class="case-badge">Ver proceso</span>
+            </div>
+          </div>
+          <div class="case-info">
+            <span class="case-index">01</span>
+            <h3 class="case-name">Phobia</h3>
+            <span class="case-tags">Web · Evento · Techno fest</span>
+            <span class="case-year">2025</span>
+          </div>
+        </a>
+
+        <a class="case reveal" href="./projects/4cuartos.html" data-src="https://prinzip96.github.io/Restaurante-ejemplo/" data-tint="#c9a227">
+          <div class="case-window">
+            <div class="case-bar">
+              <span class="case-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="case-url">prinzip96.github.io/Restaurante-ejemplo</span>
+            </div>
+            <div class="case-media">
+              <div class="case-scroll"><iframe title="4 Cuartos" tabindex="-1" loading="lazy"></iframe></div>
+              <span class="case-badge">Ver proceso</span>
+            </div>
+          </div>
+          <div class="case-info">
+            <span class="case-index">02</span>
+            <h3 class="case-name">4 Cuartos</h3>
+            <span class="case-tags">Restaurante · Web · UX</span>
+            <span class="case-year">2025</span>
+          </div>
+        </a>
+
+        <a class="case reveal" href="./projects/distrito4.html" data-src="https://prinzip96.github.io/Distrito-4/" data-tint="#d64545">
+          <div class="case-window">
+            <div class="case-bar">
+              <span class="case-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="case-url">prinzip96.github.io/Distrito-4</span>
+            </div>
+            <div class="case-media">
+              <div class="case-scroll"><iframe title="Distrito 4" tabindex="-1" loading="lazy"></iframe></div>
+              <span class="case-badge">Ver proceso</span>
+            </div>
+          </div>
+          <div class="case-info">
+            <span class="case-index">03</span>
+            <h3 class="case-name">Distrito 4</h3>
+            <span class="case-tags">Web · Hostelería · Reservas</span>
+            <span class="case-year">2025</span>
+          </div>
+        </a>
+
+        <a class="case reveal" href="./projects/desbloque.html" data-src="https://desbloque.com" data-tint="#3dd6c6">
+          <div class="case-window">
+            <div class="case-bar">
+              <span class="case-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="case-url">desbloque.com</span>
+            </div>
+            <div class="case-media">
+              <div class="case-scroll"><iframe title="Desbloque" tabindex="-1" loading="lazy"></iframe></div>
+              <span class="case-badge">Ver proceso</span>
+            </div>
+          </div>
+          <div class="case-info">
+            <span class="case-index">04</span>
+            <h3 class="case-name">Desbloque</h3>
+            <span class="case-tags">Web · Producto · Proyecto real</span>
+            <span class="case-year">2026</span>
+          </div>
+        </a>
+
+        <a class="case reveal" href="https://wellnessbubbles.com" target="_blank" rel="noopener noreferrer" data-src="https://wellnessbubbles.com" data-tint="#9ad0ff">
+          <div class="case-window">
+            <div class="case-bar">
+              <span class="case-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+              <span class="case-url">wellnessbubbles.com</span>
+            </div>
+            <div class="case-media">
+              <div class="case-scroll"><iframe title="Wellness Bubbles" tabindex="-1" loading="lazy"></iframe></div>
+              <span class="case-badge">Abrir web</span>
+            </div>
+          </div>
+          <div class="case-info">
+            <span class="case-index">05</span>
+            <h3 class="case-name">Wellness Bubbles</h3>
+            <span class="case-tags">Web · Wellness · Reservas</span>
+            <span class="case-year">2026</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ——— Números ——— -->
+    <!-- ——— Servicios ——— -->
+    <section class="services" id="servicios">
+      <div class="section-head">
+        <h2 class="section-title">Servicios</h2>
+        <span class="section-count">(04)</span>
+      </div>
+
+      <div class="acc-list" id="services">
+        <article class="acc reveal">
+          <button class="acc-head" type="button" aria-expanded="false">
+            <span class="acc-index">01</span>
+            <span class="acc-title">Diseño web</span>
+            <span class="acc-meta">Estructura · Interfaz · Prototipo</span>
+            <span class="acc-icon" aria-hidden="true"></span>
+          </button>
+          <div class="acc-panel">
+            <div class="acc-inner">
+              <p>
+                Decido qué va en cada pantalla y en qué orden antes de que nada
+                se vea bonito. Si la estructura está mal, el diseño no la
+                salva. Te lo enseño navegable para que lo pruebes tú, no en una
+                imagen plana.
+              </p>
+              <ul class="tags">
+                <li>Estructura y wireframes</li>
+                <li>Diseño de interfaz</li>
+                <li>Prototipo navegable</li>
+                <li>Versión móvil</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="acc reveal">
+          <button class="acc-head" type="button" aria-expanded="false">
+            <span class="acc-index">02</span>
+            <span class="acc-title">Desarrollo y montaje</span>
+            <span class="acc-meta">HTML · CSS · JS · WordPress</span>
+            <span class="acc-icon" aria-hidden="true"></span>
+          </button>
+          <div class="acc-panel">
+            <div class="acc-inner">
+              <p>
+                La monto yo, así que lo que ves en el diseño es exactamente lo
+                que acaba en pantalla. Sin "eso no se puede hacer" a mitad del
+                proyecto. Rápida, bien en móvil y publicada funcionando.
+              </p>
+              <ul class="tags">
+                <li>Maquetación HTML / CSS / JS</li>
+                <li>WordPress</li>
+                <li>Animaciones e interacción</li>
+                <li>Rendimiento y velocidad</li>
+                <li>Publicación y dominio</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="acc reveal">
+          <button class="acc-head" type="button" aria-expanded="false">
+            <span class="acc-index">03</span>
+            <span class="acc-title">Rediseño</span>
+            <span class="acc-meta">Web existente · Actualización</span>
+            <span class="acc-icon" aria-hidden="true"></span>
+          </button>
+          <div class="acc-panel">
+            <div class="acc-inner">
+              <p>
+                Ya tienes web pero se ha quedado vieja, va lenta o la gente no
+                encuentra lo que busca. Miro qué falla de verdad, qué merece la
+                pena conservar y rehago el resto.
+              </p>
+              <ul class="tags">
+                <li>Revisión de lo que hay</li>
+                <li>Qué se mantiene y qué cambia</li>
+                <li>Nueva interfaz</li>
+                <li>Migración sin perder nada</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+        <article class="acc reveal">
+          <button class="acc-head" type="button" aria-expanded="false">
+            <span class="acc-index">04</span>
+            <span class="acc-title">Reservas y tienda</span>
+            <span class="acc-meta">Formularios · Pagos · Citas</span>
+            <span class="acc-icon" aria-hidden="true"></span>
+          </button>
+          <div class="acc-panel">
+            <div class="acc-inner">
+              <p>
+                Cuando la web tiene que hacer algo más que enseñar: que la gente
+                reserve mesa, pida cita o pague. Monto el flujo entero y lo
+                pruebo hasta que no se atasca en ningún paso.
+              </p>
+              <ul class="tags">
+                <li>Reservas y citas</li>
+                <li>Formularios que llegan</li>
+                <li>Pagos online</li>
+                <li>Pruebas de todo el flujo</li>
+              </ul>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ——— IA: cuatro escenas fijadas al scroll ——— -->
+    <section class="ia" id="ia">
+      <div class="ia-sticky">
+        <div class="ia-stage">
+          <canvas class="ia-canvas" id="iaCanvas" aria-hidden="true"></canvas>
+        </div>
+
+        <div class="ia-copy">
+          <span class="label">Contenido con IA</span>
+          <p class="ia-index" id="iaIndex">01 / 04</p>
+
+          <div class="ia-slides" id="iaSlides">
+            <article class="ia-slide is-on">
+              <h2>Empiezo con ruido</h2>
+              <p>
+                Un prompt no es una pieza. Es la instrucción: qué tiene que
+                salir, para quién y en qué formato. Si esto está flojo, lo que
+                genere después da igual.
+              </p>
+            </article>
+            <article class="ia-slide">
+              <h2>Sale una imagen</h2>
+              <p>
+                Genero muchas y tiro casi todas. El valor no está en pulsar el
+                botón, está en saber cuál sirve y por qué.
+              </p>
+            </article>
+            <article class="ia-slide">
+              <h2>La convierto en vídeo</h2>
+              <p>
+                Ritmo, corte y color de verdad. Nada sale tal cual lo escupe el
+                modelo: el montaje es el trabajo.
+              </p>
+            </article>
+            <article class="ia-slide">
+              <h2>La pruebo en campaña</h2>
+              <p>
+                Varias creatividades a la vez, miro cuál funciona y las demás
+                fuera. Aquí es donde la velocidad se nota.
+              </p>
+            </article>
+          </div>
+
+          <ol class="ia-pips" id="iaPips" aria-hidden="true">
+            <li class="is-on"></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ol>
+
+          <p class="ia-foot">
+            Sin sesión de fotos ni productora. Días en vez de semanas.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ——— Proceso ——— -->
+    <section class="process" id="proceso">
+      <div class="section-head">
+        <h2 class="section-title">Cómo lo hacemos</h2>
+        <span class="section-count">(04)</span>
+      </div>
+
+      <div class="steps">
+        <article class="step reveal">
+          <span class="step-num">01</span>
+          <h3>Hablamos</h3>
+          <p>Qué tienes y a dónde quieres llegar.</p>
+        </article>
+        <article class="step reveal reveal-delay-1">
+          <span class="step-num">02</span>
+          <h3>Defino la idea</h3>
+          <p>Primero la historia, después Figma.</p>
+        </article>
+        <article class="step reveal reveal-delay-2">
+          <span class="step-num">03</span>
+          <h3>Te lo enseño</h3>
+          <p>Por fases y pronto, sin sorpresas al final.</p>
+        </article>
+        <article class="step reveal reveal-delay-2">
+          <span class="step-num">04</span>
+          <h3>Lo monto</h3>
+          <p>Funcionando y listo para que lo lleves tú.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ——— Interludio 3D: campo de barras tipo ecualizador ——— -->
+    <section class="wave" id="sonido">
+      <div class="wave-stage" id="waveStage">
+        <canvas id="waveCanvas"></canvas>
+      </div>
+      <div class="wave-copy">
+        <span class="wave-kicker">Sonido</span>
+        <p class="wave-line">Todo esto se monta <em>con música puesta</em></p>
+        <span class="wave-hint">Mueve el ratón por encima</span>
+      </div>
+    </section>
+
+    <!-- ——— Sobre mí ——— -->
+    <section class="about" id="sobre-mi">
+      <div class="section-head">
+        <h2 class="section-title">Sobre mí</h2>
+        <span class="section-count">Málaga · <time data-clock>--:--</time></span>
+      </div>
+
+      <!-- Declaración a tamaño bestia -->
+      <p class="about-say reveal">
+        <span class="say"><span>Diseño webs con <em>personalidad</em></span></span>
+        <span class="say"><span>y las monto yo, de la idea</span></span>
+        <span class="say"><span>al sitio funcionando.</span></span>
+      </p>
+
+      <div class="about-main">
+        <div class="dither reveal">
+          <div class="dither-stage" id="ditherStage">
+            <canvas id="ditherCanvas"></canvas>
+          </div>
+          <div class="dither-foot">
+            <span class="label" id="ditherName">Bola</span>
+            <button class="dither-next" type="button" id="ditherNext">
+              Cambiar de figura
+            </button>
+          </div>
+        </div>
+
+        <div class="about-stack">
+          <article class="bento-card is-now reveal reveal-delay-1">
+            <span class="label">Ahora</span>
+            <ul class="now">
+              <li class="now-row">
+                <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+                <span class="now-key">Sitio</span>
+                <span class="now-val">Top Digital</span>
+              </li>
+              <li class="now-row">
+                <span class="now-dot" aria-hidden="true"></span>
+                <span class="now-key">Rol</span>
+                <span class="now-val">En plantilla</span>
+              </li>
+              <li class="now-row">
+                <span class="now-dot" aria-hidden="true"></span>
+                <span class="now-key">Hago</span>
+                <span class="now-val">Webs, apps y Kit Digital</span>
+              </li>
+            </ul>
+            <p class="bento-note">Málaga. Entré de prácticas y me quedé.</p>
+          </article>
+
+          <article class="bento-card reveal reveal-delay-2">
+            <span class="label">Idiomas</span>
+            <div class="meter">
+              <span class="meter-top"><b>Español</b><i>nativo</i></span>
+              <span class="meter-bar"><em style="--v: 100%"></em></span>
+            </div>
+            <div class="meter">
+              <span class="meter-top"><b>Inglés</b><i>fluido</i></span>
+              <span class="meter-bar"><em style="--v: 78%"></em></span>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- Lo que sí y lo que no -->
+      <div class="creed">
+        <div class="creed-col reveal">
+          <span class="label">Lo que sí</span>
+          <ul>
+            <li>Decirte el precio antes de empezar</li>
+            <li>Diseñar y programar yo, sin cadena de mandos</li>
+            <li>Enseñártelo navegable, no en una imagen</li>
+            <li>Dejártela para que la lleves tú</li>
+          </ul>
+        </div>
+
+        <div class="creed-col is-no reveal reveal-delay-1">
+          <span class="label">Lo que no</span>
+          <ul>
+            <li>Plantillas con tu logo encima</li>
+            <li>Hablarte en idioma de agencia</li>
+            <li>Webs bonitas que tardan cinco segundos</li>
+            <li>Desaparecer el día de la entrega</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- CAMBIAR: pon tus cifras reales -->
+      <div class="stats">
+        <div class="stat reveal">
+          <span class="stat-num" data-count="5">0</span>
+          <span class="label">Proyectos publicados</span>
+        </div>
+        <div class="stat reveal reveal-delay-1">
+          <span class="stat-num" data-count="2">0</span>
+          <span class="label">Años diseñando</span>
+        </div>
+        <div class="stat reveal reveal-delay-2">
+          <span class="stat-num" data-count="100" data-suffix="%">0</span>
+          <span class="label">Proyectos entregados</span>
+        </div>
+        <div class="stat reveal reveal-delay-2">
+          <span class="stat-num" data-count="24" data-suffix="h">0</span>
+          <span class="label">Tiempo de respuesta</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ——— Currículum ——— -->
+    <section class="resume" id="curriculum">
+      <div class="section-head">
+        <h2 class="section-title">Currículum</h2>
+        <button class="resume-pdf" type="button" id="resumePdf">
+          <span>Descargar en PDF</span><span class="arr">↓</span>
+        </button>
+      </div>
+
+      <div class="resume-grid">
+        <div class="timeline" id="timeline">
+          <div class="tl-group">
+            <span class="tl-year">2025</span>
+
+            <div class="tl-items">
+              <article class="tl reveal">
+                <div class="tl-head">
+                  <h3>Primeros proyectos</h3>
+                </div>
+                <p class="tl-meta">Encargos y proyectos de clase</p>
+                <p class="tl-text">
+                  Phobia, 4 Cuartos y Distrito 4. Hostelería y eventos, casi
+                  siempre en equipo y con entrega cerrada.
+                </p>
+              </article>
+
+              <article class="tl reveal">
+                <div class="tl-head">
+                  <h3>Top Digital</h3>
+                  <span class="tl-tag is-soft">Prácticas</span>
+                </div>
+                <p class="tl-meta">1 mes</p>
+                <p class="tl-text">
+                  Redes sociales, piezas digitales y mantenimiento de webs de
+                  clientes. Primer contacto con plazos reales.
+                </p>
+              </article>
+            </div>
+          </div>
+
+          <div class="tl-group">
+            <span class="tl-year">2026</span>
+
+            <div class="tl-items">
+              <article class="tl reveal">
+                <div class="tl-head">
+                  <h3>Grado Superior de Marketing y Publicidad</h3>
+                  <span class="tl-tag is-soft">Terminado</span>
+                </div>
+                <p class="tl-meta">Cesur Teatinos · Málaga</p>
+                <p class="tl-text">
+                  Comunicación y diseño digital aplicados a proyectos reales de
+                  clase.
+                </p>
+              </article>
+
+              <article class="tl reveal">
+                <div class="tl-head">
+                  <h3>Proyectos propios</h3>
+                </div>
+                <p class="tl-meta">Freelance, en paralelo</p>
+                <p class="tl-text">
+                  Webs completas de principio a fin: Desbloque y Wellness
+                  Bubbles. Diseño, montaje y publicación.
+                </p>
+              </article>
+
+              <article class="tl is-now reveal">
+                <div class="tl-head">
+                  <h3>Top Digital</h3>
+                  <span class="tl-tag">Ahora</span>
+                </div>
+                <p class="tl-meta">En plantilla · Málaga</p>
+                <p class="tl-text">
+                  Webs y aplicaciones para clientes de la empresa, buena parte
+                  dentro del programa Kit Digital. Entré de prácticas y me
+                  quedé.
+                </p>
+              </article>
+            </div>
+          </div>
+        </div>
+
+        <aside class="resume-side">
+          <div class="side-card is-key reveal">
+            <span class="label">Sé hacer</span>
+            <ul class="mini">
+              <li>Webs de principio a fin</li>
+              <li>Aplicaciones web funcionales</li>
+              <li>Paneles de control y CRM</li>
+              <li>Zonas privadas de cliente</li>
+              <li>Reservas, citas y pagos</li>
+              <li>Vídeo e imagen generados con IA</li>
+              <li>Creatividades y apoyo en paid media</li>
+            </ul>
+          </div>
+
+          <div class="side-card reveal reveal-delay-1">
+            <span class="label">Herramientas</span>
+
+            <div class="tool-group">
+              <span class="tool-head">Diseño</span>
+              <ul class="chips">
+                <li>Figma</li>
+                <li>Photoshop</li>
+                <li>Illustrator</li>
+              </ul>
+            </div>
+            <div class="tool-group">
+              <span class="tool-head">Código</span>
+              <ul class="chips">
+                <li>HTML</li>
+                <li>CSS</li>
+                <li>JavaScript</li>
+                <li>WordPress</li>
+              </ul>
+            </div>
+            <div class="tool-group">
+              <span class="tool-head">Lo demás</span>
+              <ul class="chips">
+                <li>Notion</li>
+                <li>Canva</li>
+                <li>IA generativa</li>
+              </ul>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ——— Preguntas ——— -->
+    <section class="faq" id="preguntas">
+      <div class="section-head">
+        <h2 class="section-title">Preguntas frecuentes</h2>
+        <span class="section-count">(04)</span>
+      </div>
+
+      <div class="acc-list" id="faqList">
+        <article class="acc reveal">
+          <button class="acc-head" type="button" aria-expanded="false">
+            <span class="acc-title">¿Cuánto cuesta un proyecto?</span>
+            <span class="acc-icon" aria-hidden="true"></span>
+          </button>
+          <div class="acc-panel">
+            <div class="acc-inner">
+              <p>
+                Depende del alcance, y prefiero decírtelo claro después de
+                hablar que darte un número al azar. Cuéntame qué necesitas y te
+                mando un presupuesto cerrado, sin sorpresas a mitad.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <article class="acc reveal">
+          <button class="acc-head" type="button" aria-expanded="false">
+            <span class="acc-title">¿Cuánto se tarda?</span>
+            <span class="acc-icon" aria-hidden="true"></span>
+          </button>
+          <div class="acc-panel">
+            <div class="acc-inner">
+              <p>
+                Una landing puede estar en una o dos semanas. Un sitio completo,
+                entre tres y seis, según lo rápido que cerremos decisiones. Te
+                doy fechas antes de empezar.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <article class="acc reveal">
+          <button class="acc-head" type="button" aria-expanded="false">
+            <span class="acc-title">¿Trabajas en remoto?</span>
+            <span class="acc-icon" aria-hidden="true"></span>
+          </button>
+          <div class="acc-panel">
+            <div class="acc-inner">
+              <p>
+                Sí, sin problema. Estoy en Málaga, pero la mayoría del trabajo
+                lo hago en remoto con llamadas cortas y avances por escrito para
+                que siempre sepas por dónde va.
+              </p>
+            </div>
+          </div>
+        </article>
+
+        <article class="acc reveal">
+          <button class="acc-head" type="button" aria-expanded="false">
+            <span class="acc-title">¿Qué me llevo al acabar?</span>
+            <span class="acc-icon" aria-hidden="true"></span>
+          </button>
+          <div class="acc-panel">
+            <div class="acc-inner">
+              <p>
+                La web publicada y funcionando, los archivos del diseño y un
+                vídeo corto explicándote cómo editarla tú sin romper nada.
+              </p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ——— Contacto ——— -->
+    <section class="contact" id="contacto">
+      <p class="contact-kicker reveal">¿Tienes algo en mente?</p>
+      <h2 class="contact-title reveal">
+        <span class="line"><span>Hablemos</span></span>
+      </h2>
+      <div class="contact-body reveal reveal-delay-1">
+        <p>
+          Te hago tres preguntas rápidas, eliges y te escribo yo con el mensaje
+          ya montado. Nada de formularios de doce campos.
+        </p>
+        <button class="contact-start magnetic" type="button" data-open-chat>
+          <span>Empezar</span>
+          <span class="arr">→</span>
+        </button>
+      </div>
+
+      <div class="contact-alt reveal reveal-delay-2">
+        <span class="label">O directamente</span>
+        <a class="contact-mail" href="mailto:jaimesnchz9966@gmail.com">jaimesnchz9966@gmail.com</a>
+      </div>
+
+      <div class="contact-foot reveal reveal-delay-2">
+        <span class="status">Disponible para nuevos proyectos</span>
+        <span class="clock">Hora en Málaga · <time id="clock">--:--</time></span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-brand">
+      <p class="footer-name">Jaime Sánchez<sup>®</sup></p>
+      <p class="muted">Portfolio creativo · Málaga, España</p>
+    </div>
+    <div class="footer-col">
+      <span class="label">Social</span>
+      <a href="https://www.linkedin.com/in/jaime-sanchez-2835342b7/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+    </div>
+    <div class="footer-col">
+      <span class="label">Menú</span>
+      <a href="#trabajos">Proyectos</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#ia">IA</a>
+      <a href="#sobre-mi">Sobre mí</a>
+      <a href="#preguntas">Preguntas</a>
+    </div>
+    <p class="footer-year">© 2026</p>
+  </footer>
+
+  <!-- ——— Flujo de contacto ——— -->
+  <div class="chat" id="chat" role="dialog" aria-modal="true" aria-label="Contacto" hidden>
+    <div class="chat-back-drop" data-close-chat></div>
+
+    <div class="chat-panel">
+      <header class="chat-top">
+        <button class="chat-prev" type="button" id="chatPrev" hidden>← Atrás</button>
+        <span class="chat-count" id="chatCount">01 / 04</span>
+        <button class="chat-x" type="button" data-close-chat aria-label="Cerrar">✕</button>
+      </header>
+
+      <div class="chat-bar"><span id="chatBar"></span></div>
+
+      <div class="chat-body">
+        <section class="chat-q is-on" data-q="1">
+          <span class="chat-tag">Pregunta 01</span>
+          <h3>¿Qué necesitas?</h3>
+          <div class="chat-picks">
+            <button class="pick" type="button" data-group="1" data-value="una web nueva desde cero">
+              <span class="pick-name">Una web nueva</span>
+              <span class="pick-desc">No tengo nada, o lo que tengo no sirve.</span>
+              <span class="pick-stat">Diseño + montaje</span>
+            </button>
+            <button class="pick" type="button" data-group="1" data-value="rediseñar la web que ya tengo">
+              <span class="pick-name">Rediseñar la mía</span>
+              <span class="pick-desc">Ya existe, pero se ha quedado vieja o no funciona.</span>
+              <span class="pick-stat">Revisión + rehacer</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="chat-q" data-q="2">
+          <span class="chat-tag">Pregunta 02</span>
+          <h3>¿Para qué la vas a usar?</h3>
+          <div class="chat-picks">
+            <button class="pick" type="button" data-group="2" data-value="para enseñar lo que hago y que me escriban">
+              <span class="pick-name">Enseñar y que me escriban</span>
+              <span class="pick-desc">Una página que explique bien y acabe en contacto.</span>
+              <span class="pick-stat">Landing · Portfolio</span>
+            </button>
+            <button class="pick" type="button" data-group="2" data-value="para que la gente reserve o compre">
+              <span class="pick-name">Reservar o comprar</span>
+              <span class="pick-desc">La gente tiene que poder hacer algo ahí dentro.</span>
+              <span class="pick-stat">Reservas · Tienda</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="chat-q" data-q="3">
+          <span class="chat-tag">Pregunta 03</span>
+          <h3>¿Con cuánta prisa?</h3>
+          <div class="chat-picks">
+            <button class="pick" type="button" data-group="3" data-value="hay una fecha y no se puede mover">
+              <span class="pick-name">Hay fecha</span>
+              <span class="pick-desc">Sale un día concreto y no se mueve.</span>
+              <span class="pick-stat">Ritmo rápido</span>
+            </button>
+            <button class="pick" type="button" data-group="3" data-value="sin fecha, prefiero que esté bien">
+              <span class="pick-name">Sin prisa</span>
+              <span class="pick-desc">Prefiero que esté bien antes que rápido.</span>
+              <span class="pick-stat">Más vueltas</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="chat-q" data-q="4">
+          <span class="chat-tag">Último paso</span>
+          <h3>Dime quién eres y te escribo</h3>
+
+          <p class="chat-sum" id="chatSum"></p>
+
+          <form class="chat-form" id="chatForm" novalidate>
+            <label class="field">
+              <span>Tu nombre</span>
+              <input type="text" id="chatWho" autocomplete="name" placeholder="Jaime" required />
+            </label>
+            <label class="field">
+              <span>Algo más que deba saber</span>
+              <textarea id="chatMore" rows="2" placeholder="Opcional: enlaces, presupuesto, fechas"></textarea>
+            </label>
+            <button class="chat-send magnetic" type="submit">
+              <span>Enviar</span>
+              <span class="arr">→</span>
+            </button>
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="cursor" id="cursor" aria-hidden="true">
+    <span class="cursor-label" id="cursorLabel">Ver</span>
+  </div>
+
+  <script src="./script.js"></script>
+  <script type="module" src="./blob.js"></script>
+  <script type="module" src="./wave.js"></script>
+  <script type="module" src="./dither.js"></script>
+  <script type="module" src="./ia.js"></script>
+</body>
+</html>
