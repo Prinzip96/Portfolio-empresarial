@@ -1,0 +1,5 @@
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "npx serve -l tcp://0.0.0.0:$PORT ."
