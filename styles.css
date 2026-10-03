@@ -1230,6 +1230,7 @@ sup {
 .about-side {
   display: flex;
   flex-direction: column;
+  gap: clamp(18px, 2vw, 28px);
   min-height: 0;
   padding: clamp(22px, 2.4vw, 36px);
   border: 1px solid var(--line);
@@ -1238,9 +1239,9 @@ sup {
 }
 
 .about-now {
-  margin: 16px 0 0;
+  margin: 10px 0 0;
   font-family: var(--font-display);
-  font-size: clamp(28px, 3.2vw, 48px);
+  font-size: clamp(26px, 2.8vw, 40px);
   line-height: 1.08;
   letter-spacing: -0.03em;
 }
@@ -1251,15 +1252,57 @@ sup {
 }
 
 .about-aside {
-  margin: 16px 0 0;
+  margin: 10px 0 0;
   font-size: 15px;
   line-height: 1.5;
   color: var(--muted);
 }
 
+.about-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(16px, 2vw, 28px);
+  padding-top: 6px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.about-list {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.about-list li {
+  position: relative;
+  padding-left: 14px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--fg);
+}
+
+.about-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.7em;
+  width: 8px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.about-list.is-no li {
+  color: var(--muted);
+}
+
+.about-list.is-no li::before {
+  background: var(--muted);
+}
+
 .about-langs {
-  margin-top: auto;
-  padding-top: clamp(28px, 3vw, 44px);
+  padding-top: 4px;
+  border-top: 1px solid var(--line-soft);
 }
 
 /* ——— Lo que sí / lo que no ——— */
@@ -2847,6 +2890,10 @@ body.chat-open {
 
   .tl::before {
     display: none;
+  }
+
+  .about-split {
+    grid-template-columns: 1fr;
   }
 
   .now-row {
