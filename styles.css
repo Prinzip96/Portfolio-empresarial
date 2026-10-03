@@ -1227,10 +1227,39 @@ sup {
   border-top: 1px solid var(--line-soft);
 }
 
-.about-stack {
-  display: grid;
-  gap: clamp(14px, 1.8vw, 24px);
-  align-content: stretch;
+.about-side {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: clamp(22px, 2.4vw, 36px);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(244, 242, 238, 0.018);
+}
+
+.about-now {
+  margin: 16px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.2vw, 48px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.about-now em {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.about-aside {
+  margin: 16px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.about-langs {
+  margin-top: auto;
+  padding-top: clamp(28px, 3vw, 44px);
 }
 
 /* ——— Lo que sí / lo que no ——— */
@@ -3029,12 +3058,22 @@ body.chat-open {
     padding-bottom: 4mm;
   }
 
-  .bento-card {
+  .bento-card,
+  .about-side {
     padding: 0 0 3mm;
     border: 0;
     border-radius: 0;
     background: none;
     break-inside: avoid;
+  }
+
+  .about-now {
+    font-size: 16pt;
+    color: #111;
+  }
+
+  .about-now em {
+    color: #111;
   }
 
   .creed-col li {
