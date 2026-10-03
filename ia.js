@@ -11,6 +11,9 @@ if (section && canvas) start(section, canvas);
 
 function start(section, canvas) {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const mobile =
+    window.matchMedia("(max-width: 900px)").matches ||
+    window.matchMedia("(pointer: coarse)").matches;
   const ctx = canvas.getContext("2d", { alpha: true });
   if (!ctx) return;
 
@@ -18,7 +21,7 @@ function start(section, canvas) {
   const pips = Array.from(document.querySelectorAll("#iaPips li"));
   const indexEl = document.getElementById("iaIndex");
 
-  const PIXEL = 5;
+  const PIXEL = mobile ? 8 : 5;
   const BAYER = [
     0, 32, 8, 40, 2, 34, 10, 42,
     48, 16, 56, 24, 50, 18, 58, 26,
@@ -37,8 +40,8 @@ function start(section, canvas) {
   let image = null;
 
   const resize = () => {
-    w = Math.max(8, Math.round((canvas.clientWidth || 1) / PIXEL));
-    h = Math.max(8, Math.round((canvas.clientHeight || 1) / PIXEL));
+    w = Math.max(8, Math.min(140, Math.round((canvas.clientWidth || 1) / PIXEL)));
+    h = Math.max(8, Math.min(140, Math.round((canvas.clientHeight || 1) / PIXEL)));
     canvas.width = w;
     canvas.height = h;
     image = ctx.createImageData(w, h);
@@ -236,7 +239,7 @@ function start(section, canvas) {
         visible = entry.isIntersecting;
       },
       { threshold: 0 }
-    ).observe(section);
+    ).observe(canvas);
   }
 
   measure();
@@ -251,12 +254,29 @@ function start(section, canvas) {
 
   draw(0);
 
+  /* En móvil no corre a 24 fps: solo redibuja cuando el scroll cambia de escena. */
+  if (mobile) {
+    let lastP = -1;
+    const onScroll = () => {
+      if (!visible || document.hidden) return;
+      measure();
+      paintUi();
+      const snapped = Math.round(p * 32);
+      if (snapped === lastP) return;
+      lastP = snapped;
+      draw(p * 8);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return;
+  }
+
   const t0 = performance.now();
   let last = 0;
 
   const frame = (now) => {
     requestAnimationFrame(frame);
-    if (!visible) return;
+    if (!visible || document.hidden) return;
     if (now - last < 42) return;
     last = now;
 

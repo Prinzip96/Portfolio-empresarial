@@ -99,22 +99,35 @@
       fit();
       window.addEventListener("resize", fit, { passive: true });
 
+      const unload = () => {
+        if (!frame.dataset.loaded) return;
+        frame.removeAttribute("src");
+        frame.src = "about:blank";
+        delete frame.dataset.loaded;
+      };
+
       const load = () => {
         if (frame.dataset.loaded) return;
         frame.dataset.loaded = "1";
         frame.src = card.dataset.src || "";
       };
 
+      /* En móvil no se cargan: son cinco webs enteras y tiran la pestaña. */
+      if (!fine || !wide) {
+        card.classList.add("is-still");
+        frame.remove();
+        return;
+      }
+
       if ("IntersectionObserver" in window) {
         const io = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
-              if (!entry.isIntersecting) return;
-              load();
-              io.unobserve(entry.target);
+              if (entry.isIntersecting) load();
+              else unload();
             });
           },
-          { rootMargin: "300px 0px" }
+          { rootMargin: "40px 0px" }
         );
         io.observe(card);
       } else {
@@ -210,13 +223,24 @@
     ringStage.addEventListener("pointercancel", release);
 
     if (!reduceMotion) {
+      let ringOn = true;
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(
+          ([entry]) => {
+            ringOn = entry.isIntersecting;
+          },
+          { threshold: 0 }
+        ).observe(ringStage);
+      }
+
       const spin = () => {
+        requestAnimationFrame(spin);
+        if (!ringOn || document.hidden) return;
         if (!dragging) {
           velocity *= 0.93;
           angle += 0.16 + velocity;
           paint();
         }
-        requestAnimationFrame(spin);
       };
       requestAnimationFrame(spin);
     }

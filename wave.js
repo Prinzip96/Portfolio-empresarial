@@ -3,14 +3,33 @@ import { snoise } from "./glsl-noise.js";
 
 const stage = document.getElementById("waveStage");
 const canvas = document.getElementById("waveCanvas");
-if (stage && canvas) start(stage, canvas);
+if (stage && canvas) {
+  /* No monta WebGL hasta que la sección se acerca. En el hero ya hay otro. */
+  const boot = () => start(stage, canvas);
+  if (!("IntersectionObserver" in window)) {
+    boot();
+  } else {
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        boot();
+      },
+      { rootMargin: "160px 0px" }
+    );
+    io.observe(stage);
+  }
+}
 
 function start(stage, canvas) {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const mobile =
+    window.matchMedia("(max-width: 900px)").matches ||
+    window.matchMedia("(pointer: coarse)").matches;
 
   /* Rejilla de barras. Cada una sube y baja con ruido, como un ecualizador. */
-  const COLS = 76;
-  const ROWS = 24;
+  const COLS = mobile ? 28 : 52;
+  const ROWS = mobile ? 10 : 16;
   const GAP = 0.6;
   const BAR = 0.34;
   const HALF_W = ((COLS - 1) * GAP) / 2;
@@ -92,13 +111,18 @@ function start(stage, canvas) {
 
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer = new THREE.WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: !mobile,
+      powerPreference: "low-power",
+    });
   } catch (err) {
     stage.remove();
     return;
   }
 
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.6));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1 : 1.25));
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 120);
@@ -183,6 +207,10 @@ function start(stage, canvas) {
 
   /* ——— Entra con el scroll: las barras suben cuando llegas ——— */
   let visible = true;
+  let pageHidden = false;
+  document.addEventListener("visibilitychange", () => {
+    pageHidden = document.hidden;
+  });
   if ("IntersectionObserver" in window) {
     new IntersectionObserver(
       ([entry]) => {
@@ -203,7 +231,7 @@ function start(stage, canvas) {
 
   const frame = () => {
     requestAnimationFrame(frame);
-    if (!visible) return;
+    if (!visible || pageHidden) return;
 
     const p = progress();
 

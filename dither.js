@@ -11,14 +11,17 @@ if (stage && canvas) start(stage, canvas);
 
 function start(stage, canvas) {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const mobile =
+    window.matchMedia("(max-width: 900px)").matches ||
+    window.matchMedia("(pointer: coarse)").matches;
   const ctx = canvas.getContext("2d", { alpha: true });
   if (!ctx) return;
 
   const nameEl = document.getElementById("ditherName");
   const nextEl = document.getElementById("ditherNext");
 
-  /* Lado del píxel en pantalla. Más alto = más gordo. */
-  const PIXEL = 5;
+  /* Lado del píxel en pantalla. Más alto = más gordo y menos trabajo. */
+  const PIXEL = mobile ? 8 : 5;
 
   /* Matriz de Bayer 8x8: el patrón de puntos ordenado de toda la vida */
   const BAYER = [
@@ -41,8 +44,8 @@ function start(stage, canvas) {
   let image = null;
 
   const resize = () => {
-    w = Math.max(8, Math.round((stage.clientWidth || 1) / PIXEL));
-    h = Math.max(8, Math.round((stage.clientHeight || 1) / PIXEL));
+    w = Math.max(8, Math.min(140, Math.round((stage.clientWidth || 1) / PIXEL)));
+    h = Math.max(8, Math.min(120, Math.round((stage.clientHeight || 1) / PIXEL)));
     canvas.width = w;
     canvas.height = h;
     image = ctx.createImageData(w, h);
@@ -224,10 +227,10 @@ function start(stage, canvas) {
 
   const frame = (now) => {
     requestAnimationFrame(frame);
-    if (!visible) return;
+    if (!visible || document.hidden) return;
 
-    /* 24 fps a propósito: así se nota más el grano */
-    if (now - last < 42) return;
+    /* En móvil 12 fps; en PC 24. El grano se nota igual. */
+    if (now - last < (mobile ? 80 : 42)) return;
     last = now;
 
     mx += (tmx - mx) * 0.07;

@@ -7,6 +7,9 @@ if (canvas && stage) start(canvas, stage);
 
 function start(canvas, stage) {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const mobile =
+    window.matchMedia("(max-width: 900px)").matches ||
+    window.matchMedia("(pointer: coarse)").matches;
 
   const noise = snoise;
 
@@ -69,13 +72,18 @@ function start(canvas, stage) {
 
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer = new THREE.WebGLRenderer({
+      canvas,
+      alpha: true,
+      antialias: !mobile,
+      powerPreference: "low-power",
+    });
   } catch (err) {
     stage.remove();
     return;
   }
 
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1 : 1.25));
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
@@ -92,25 +100,29 @@ function start(canvas, stage) {
   const group = new THREE.Group();
   scene.add(group);
 
+  /* 48 subdivisiones eran ~46.000 caras. Con 16 se ve igual y no fríe el móvil. */
   const body = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(1, 48),
+    new THREE.IcosahedronGeometry(1, mobile ? 6 : 16),
     new THREE.ShaderMaterial({ vertexShader: vertex, fragmentShader: fragment, uniforms })
   );
   group.add(body);
 
   const wireUniforms = { ...uniforms, uScale: { value: 1.075 } };
-  const wire = new THREE.Mesh(
-    new THREE.IcosahedronGeometry(1, 10),
-    new THREE.ShaderMaterial({
-      vertexShader: vertex,
-      fragmentShader: wireFragment,
-      uniforms: wireUniforms,
-      wireframe: true,
-      transparent: true,
-      depthWrite: false,
-    })
-  );
-  group.add(wire);
+  let wire = null;
+  if (!mobile) {
+    wire = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(1, 8),
+      new THREE.ShaderMaterial({
+        vertexShader: vertex,
+        fragmentShader: wireFragment,
+        uniforms: wireUniforms,
+        wireframe: true,
+        transparent: true,
+        depthWrite: false,
+      })
+    );
+    group.add(wire);
+  }
 
   const resize = () => {
     const w = stage.clientWidth || 1;
@@ -166,6 +178,10 @@ function start(canvas, stage) {
   );
 
   let visible = true;
+  let pageHidden = false;
+  document.addEventListener("visibilitychange", () => {
+    pageHidden = document.hidden;
+  });
   if ("IntersectionObserver" in window) {
     new IntersectionObserver(
       ([entry]) => {
@@ -179,7 +195,7 @@ function start(canvas, stage) {
 
   const frame = () => {
     requestAnimationFrame(frame);
-    if (!visible) return;
+    if (!visible || pageHidden) return;
 
     px += (tx - px) * 0.05;
     py += (ty - py) * 0.05;
@@ -187,8 +203,10 @@ function start(canvas, stage) {
 
     uniforms.uTime.value = clock.getElapsedTime();
     uniforms.uSpike.value += (spike - uniforms.uSpike.value) * 0.07;
-    wireUniforms.uTime.value = uniforms.uTime.value;
-    wireUniforms.uSpike.value = uniforms.uSpike.value;
+    if (wire) {
+      wireUniforms.uTime.value = uniforms.uTime.value;
+      wireUniforms.uSpike.value = uniforms.uSpike.value;
+    }
 
     spike *= 0.96;
 
@@ -203,7 +221,7 @@ function start(canvas, stage) {
 
   if (reduceMotion) {
     uniforms.uTime.value = 1.5;
-    wireUniforms.uTime.value = 1.5;
+    if (wire) wireUniforms.uTime.value = 1.5;
     renderer.render(scene, camera);
   } else {
     frame();
