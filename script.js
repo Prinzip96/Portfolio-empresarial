@@ -119,6 +119,18 @@
         { passive: true }
       );
     });
+
+    Array.from(document.querySelectorAll(".pick")).forEach((pick) => {
+      pick.addEventListener(
+        "pointermove",
+        (e) => {
+          const r = pick.getBoundingClientRect();
+          pick.style.setProperty("--px", `${(e.clientX - r.left).toFixed(0)}px`);
+          pick.style.setProperty("--py", `${(e.clientY - r.top).toFixed(0)}px`);
+        },
+        { passive: true }
+      );
+    });
   }
 
   /* ——— Scroll reveals ——— */

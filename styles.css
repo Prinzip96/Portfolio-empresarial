@@ -291,6 +291,76 @@ body.chat-open .talk-float {
   pointer-events: none;
 }
 
+.talk {
+  background-image: linear-gradient(
+    110deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.7) 50%,
+    transparent 62%
+  );
+  background-size: 260% 100%;
+  background-repeat: no-repeat;
+  background-position: 160% 0;
+  animation: talk-shine 5s ease-in-out infinite, talk-pulse 2.6s ease-out infinite;
+}
+
+.talk:hover {
+  animation: none;
+}
+
+.talk-label {
+  display: inline-grid;
+  justify-items: center;
+  overflow: hidden;
+}
+
+.talk-label > span,
+.talk-label::after {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+  transition: transform 0.45s var(--ease);
+}
+
+.talk-label::after {
+  content: attr(data-alt);
+  transform: translateY(110%);
+}
+
+.talk:hover .talk-label > span {
+  transform: translateY(-110%);
+}
+
+.talk:hover .talk-label::after {
+  transform: none;
+}
+
+@keyframes talk-shine {
+  0%,
+  62% {
+    background-position: 160% 0;
+  }
+  86%,
+  100% {
+    background-position: -60% 0;
+  }
+}
+
+@keyframes talk-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(188, 255, 77, 0.55);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 14px rgba(188, 255, 77, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .talk {
+    animation: none;
+  }
+}
+
 /* ——— Hero ——— */
 .hero {
   position: relative;
@@ -2127,14 +2197,40 @@ body.chat-open .talk-float {
   transition: border-color 0.4s ease, background 0.4s ease, transform 0.45s var(--ease);
 }
 
-.pick::before {
+.pick::before,
+.pick::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 85% 0%, rgba(188, 255, 77, 0.16), transparent 62%);
+  border-radius: inherit;
   opacity: 0;
   transition: opacity 0.45s ease;
   pointer-events: none;
+}
+
+.pick::before {
+  background: radial-gradient(
+    260px circle at var(--px, 85%) var(--py, 0%),
+    rgba(188, 255, 77, 0.2),
+    transparent 70%
+  );
+}
+
+/* Borde que se enciende donde está el ratón */
+.pick::after {
+  padding: 1px;
+  background: radial-gradient(
+    180px circle at var(--px, 85%) var(--py, 0%),
+    rgba(188, 255, 77, 0.9),
+    transparent 70%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.pick:hover::after {
+  opacity: 1;
 }
 
 .pick:hover {

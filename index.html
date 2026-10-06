@@ -26,7 +26,9 @@
       <a href="#sobre-mi">Sobre mí</a>
       <a href="#curriculum">Currículum</a>
     </nav>
-    <button class="nav-cta magnetic" type="button" data-open-chat>Hablemos</button>
+    <button class="nav-cta talk magnetic" type="button" data-open-chat aria-label="Hablemos">
+      <span class="talk-label" data-alt="Respondo hoy"><span>Hablemos</span></span>
+    </button>
   </header>
 
   <main>
@@ -66,8 +68,8 @@
           <span class="status">Disponible para proyectos</span>
         </div>
         <div class="hero-actions">
-          <button class="hero-talk magnetic" type="button" data-open-chat>
-            <span>Hablemos</span>
+          <button class="hero-talk talk magnetic" type="button" data-open-chat aria-label="Hablemos">
+            <span class="talk-label" data-alt="Respondo hoy"><span>Hablemos</span></span>
             <span class="arr">→</span>
           </button>
           <button class="hero-scroll magnetic" id="scrollBtn" type="button">
@@ -911,7 +913,7 @@
     </div>
   </div>
 
-  <button class="talk-float" id="talkFloat" type="button" data-open-chat aria-label="Hablemos">
+  <button class="talk-float talk" id="talkFloat" type="button" data-open-chat aria-label="Hablemos">
     <span>Hablemos</span>
     <span class="arr">→</span>
   </button>
