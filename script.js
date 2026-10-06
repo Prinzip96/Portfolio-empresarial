@@ -190,16 +190,27 @@
       fit();
       window.addEventListener("resize", fit, { passive: true });
 
-      /* Sitios que bloquean iframes (p. ej. X-Frame-Options) o móvil: preview estática. */
-      if (card.dataset.embed === "0" || !fine || !wide) {
+      /* Captura fija (sitios que bloquean iframe) o móvil: sin iframe. */
+      if (card.dataset.poster || card.dataset.embed === "0" || !fine || !wide) {
         card.classList.add("is-still");
-        try {
-          const host = new URL(card.dataset.src || card.href).hostname.replace(/^www\./, "");
-          media.dataset.host = host;
-        } catch {
-          media.dataset.host = card.querySelector(".case-name")?.textContent || "";
+        if (card.dataset.poster) {
+          card.classList.add("has-poster");
+          const img = document.createElement("img");
+          img.className = "case-poster";
+          img.src = card.dataset.poster;
+          img.alt = card.querySelector(".case-name")?.textContent || "";
+          img.loading = "lazy";
+          img.decoding = "async";
+          scroll.replaceChildren(img);
+        } else {
+          try {
+            const host = new URL(card.dataset.src || card.href).hostname.replace(/^www\./, "");
+            media.dataset.host = host;
+          } catch {
+            media.dataset.host = card.querySelector(".case-name")?.textContent || "";
+          }
+          frame.remove();
         }
-        frame.remove();
         return;
       }
 
