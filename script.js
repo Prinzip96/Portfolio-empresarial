@@ -42,6 +42,20 @@
     document.getElementById("trabajos")?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
+  /* ——— Botón flotante de contacto (móvil) ——— */
+  const talkFloat = document.getElementById("talkFloat");
+  const heroEl = document.getElementById("top");
+  const contactEl = document.getElementById("contacto");
+  if (talkFloat && heroEl) {
+    scrollTasks.push(() => {
+      const pastHero = heroEl.getBoundingClientRect().bottom < 80;
+      const atContact = contactEl
+        ? contactEl.getBoundingClientRect().top < window.innerHeight * 0.85
+        : false;
+      talkFloat.classList.toggle("is-on", pastHero && !atContact);
+    });
+  }
+
   /* ——— Luz verde: sigue al ratón en el hero y en cada proyecto ——— */
   if (fine && !reduceMotion) {
     const hero = document.querySelector(".hero");
