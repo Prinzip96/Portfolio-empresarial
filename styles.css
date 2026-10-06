@@ -2672,6 +2672,34 @@ body.chat-open {
   display: block;
 }
 
+.project-preview.is-still {
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  background:
+    radial-gradient(circle at 70% 20%, rgba(126, 200, 163, 0.28), transparent 58%),
+    #151515;
+}
+
+.project-preview.is-still::before {
+  content: attr(data-host);
+  font-family: var(--font-display);
+  font-size: clamp(28px, 5vw, 52px);
+  letter-spacing: -0.02em;
+  color: rgba(244, 242, 238, 0.88);
+}
+
+.project-preview-note {
+  grid-area: 1 / 1;
+  align-self: end;
+  margin: 0;
+  max-width: 34ch;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+  text-align: center;
+}
+
 .project-meta {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

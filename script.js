@@ -589,8 +589,10 @@
       const interactive = e.target.closest("a, button");
 
       if (cursorLabel) {
-        if (row) cursorLabel.textContent = "Abrir";
-        else if (drag) cursorLabel.textContent = "Gira";
+        if (row) {
+          const goesOut = row.target === "_blank" || /^https?:/i.test(row.getAttribute("href") || "");
+          cursorLabel.textContent = goesOut ? "Abrir" : "Ver";
+        } else if (drag) cursorLabel.textContent = "Gira";
       }
 
       cursor.classList.toggle("is-view", Boolean(row || drag));
