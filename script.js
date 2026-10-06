@@ -583,7 +583,7 @@
       const interactive = e.target.closest("a, button");
 
       if (cursorLabel) {
-        if (row) cursorLabel.textContent = "Ver";
+        if (row) cursorLabel.textContent = "Abrir";
         else if (drag) cursorLabel.textContent = "Gira";
       }
 
