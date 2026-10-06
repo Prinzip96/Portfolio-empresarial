@@ -341,6 +341,7 @@
     const sum = document.getElementById("chatSum");
     const form = document.getElementById("chatForm");
     const who = document.getElementById("chatWho");
+    const mailIn = document.getElementById("chatMail");
     const more = document.getElementById("chatMore");
     const answers = {};
     let step = 0;
@@ -409,22 +410,30 @@
       e.preventDefault();
 
       const name = who.value.trim();
+      const email = mailIn ? mailIn.value.trim() : "";
       if (!name) {
         who.focus();
+        return;
+      }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        mailIn?.focus();
         return;
       }
 
       const body = [
         `Hola Jaime, soy ${name}.`,
+        `Mi correo: ${email}`,
         "",
         `Necesito ${answers[1]}.`,
-        `La quiero ${answers[2]}.`,
+        `Lo quiero ${answers[2]}.`,
         `Sobre plazos: ${answers[3]}.`,
         more.value.trim() ? `\n${more.value.trim()}` : "",
+        "",
+        `— Respóndeme a ${email}`,
       ].join("\n");
 
       window.location.href = `mailto:${MAIL}?subject=${encodeURIComponent(
-        `Web nueva — ${name}`
+        `Proyecto — ${name}`
       )}&body=${encodeURIComponent(body)}`;
     });
   }
