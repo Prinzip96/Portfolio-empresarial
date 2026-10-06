@@ -190,6 +190,19 @@
       fit();
       window.addEventListener("resize", fit, { passive: true });
 
+      /* Sitios que bloquean iframes (p. ej. X-Frame-Options) o móvil: preview estática. */
+      if (card.dataset.embed === "0" || !fine || !wide) {
+        card.classList.add("is-still");
+        try {
+          const host = new URL(card.dataset.src || card.href).hostname.replace(/^www\./, "");
+          media.dataset.host = host;
+        } catch {
+          media.dataset.host = card.querySelector(".case-name")?.textContent || "";
+        }
+        frame.remove();
+        return;
+      }
+
       const unload = () => {
         if (!frame.dataset.loaded) return;
         frame.removeAttribute("src");
@@ -202,13 +215,6 @@
         frame.dataset.loaded = "1";
         frame.src = card.dataset.src || "";
       };
-
-      /* En móvil no se cargan: son cinco webs enteras y tiran la pestaña. */
-      if (!fine || !wide) {
-        card.classList.add("is-still");
-        frame.remove();
-        return;
-      }
 
       if ("IntersectionObserver" in window) {
         const io = new IntersectionObserver(
