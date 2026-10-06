@@ -337,44 +337,6 @@
     }
   }
 
-  /* ——— Contadores ——— */
-  const nums = Array.from(document.querySelectorAll(".stat-num"));
-  if (nums.length) {
-    const run = (el) => {
-      const target = Number(el.dataset.count || 0);
-      const suffix = el.dataset.suffix || "";
-      if (reduceMotion) {
-        el.textContent = `${target}${suffix}`;
-        return;
-      }
-      const started = performance.now();
-      const dur = 1400;
-      const tick = (now) => {
-        const p = Math.min(1, (now - started) / dur);
-        const eased = 1 - Math.pow(1 - p, 3);
-        el.textContent = `${Math.round(target * eased)}${suffix}`;
-        if (p < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-    };
-
-    if (!("IntersectionObserver" in window)) {
-      nums.forEach(run);
-    } else {
-      const io = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            run(entry.target);
-            io.unobserve(entry.target);
-          });
-        },
-        { threshold: 0.5 }
-      );
-      nums.forEach((el) => io.observe(el));
-    }
-  }
-
   /* ——— Acordeones (servicios + preguntas) ——— */
   Array.from(document.querySelectorAll(".acc-list")).forEach((list) => {
     const items = Array.from(list.querySelectorAll(".acc"));
