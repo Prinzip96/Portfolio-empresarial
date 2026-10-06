@@ -237,17 +237,29 @@ sup {
 
 .hero-glow {
   position: absolute;
-  top: -20%;
-  left: 50%;
-  width: min(1100px, 120vw);
-  aspect-ratio: 1;
-  transform: translateX(-50%);
-  background:
-    radial-gradient(circle at 40% 40%, rgba(188, 255, 77, 0.1), transparent 55%),
-    radial-gradient(circle at 65% 55%, rgba(120, 150, 255, 0.09), transparent 58%);
-  filter: blur(40px);
+  top: 0;
+  left: 0;
+  width: 70vmax;
+  height: 70vmax;
+  background: radial-gradient(
+    circle at center,
+    rgba(188, 255, 77, 0.16),
+    transparent 62%
+  );
+  filter: blur(36px);
   pointer-events: none;
-  animation: float-glow 18s ease-in-out infinite alternate;
+  transform: translate3d(
+    calc(var(--gx, 50%) - 50%),
+    calc(var(--gy, 35%) - 50%),
+    0
+  );
+  transition: opacity 0.5s ease;
+  will-change: transform;
+  opacity: 0.9;
+}
+
+.hero-glow.is-away {
+  opacity: 0.45;
 }
 
 .hero-title {
@@ -590,15 +602,20 @@ sup {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: radial-gradient(circle at 70% 0%, var(--tint), transparent 62%);
+  background: radial-gradient(
+    circle at var(--mx, 70%) var(--my, 20%),
+    var(--tint),
+    transparent 58%
+  );
   opacity: 0;
   mix-blend-mode: screen;
-  transition: opacity 0.7s ease;
+  transition: opacity 0.45s ease;
   pointer-events: none;
 }
 
-.case:hover .case-media::before {
-  opacity: 0.16;
+.case:hover .case-media::before,
+.case:focus-visible .case-media::before {
+  opacity: 0.22;
 }
 
 .case-badge {

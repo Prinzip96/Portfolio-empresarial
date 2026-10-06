@@ -42,6 +42,71 @@
     document.getElementById("trabajos")?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
+  /* ——— Luz verde: sigue al ratón en el hero y en cada proyecto ——— */
+  if (fine && !reduceMotion) {
+    const hero = document.querySelector(".hero");
+    const glow = document.getElementById("heroGlow") || document.querySelector(".hero-glow");
+
+    if (hero && glow) {
+      let gx = 50;
+      let gy = 35;
+      let tx = 50;
+      let ty = 35;
+      let glowRaf = 0;
+
+      const paintGlow = () => {
+        glowRaf = 0;
+        gx += (tx - gx) * 0.12;
+        gy += (ty - gy) * 0.12;
+        hero.style.setProperty("--gx", `${gx.toFixed(2)}%`);
+        hero.style.setProperty("--gy", `${gy.toFixed(2)}%`);
+        if (Math.abs(tx - gx) > 0.05 || Math.abs(ty - gy) > 0.05) {
+          glowRaf = requestAnimationFrame(paintGlow);
+        }
+      };
+
+      hero.addEventListener(
+        "pointermove",
+        (e) => {
+          const r = hero.getBoundingClientRect();
+          tx = ((e.clientX - r.left) / r.width) * 100;
+          ty = ((e.clientY - r.top) / r.height) * 100;
+          glow.classList.remove("is-away");
+          if (!glowRaf) glowRaf = requestAnimationFrame(paintGlow);
+        },
+        { passive: true }
+      );
+
+      hero.addEventListener(
+        "pointerleave",
+        () => {
+          tx = 50;
+          ty = 35;
+          glow.classList.add("is-away");
+          if (!glowRaf) glowRaf = requestAnimationFrame(paintGlow);
+        },
+        { passive: true }
+      );
+    }
+
+    Array.from(document.querySelectorAll(".case")).forEach((card) => {
+      const media = card.querySelector(".case-media");
+      if (!media) return;
+
+      card.addEventListener(
+        "pointermove",
+        (e) => {
+          const r = media.getBoundingClientRect();
+          const x = ((e.clientX - r.left) / r.width) * 100;
+          const y = ((e.clientY - r.top) / r.height) * 100;
+          media.style.setProperty("--mx", `${Math.min(100, Math.max(0, x)).toFixed(1)}%`);
+          media.style.setProperty("--my", `${Math.min(100, Math.max(0, y)).toFixed(1)}%`);
+        },
+        { passive: true }
+      );
+    });
+  }
+
   /* ——— Scroll reveals ——— */
   const reveals = Array.from(document.querySelectorAll(".reveal"));
   if (reveals.length) {
