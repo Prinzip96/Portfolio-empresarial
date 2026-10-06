@@ -144,10 +144,10 @@
     const items = [
       "Diseño web",
       "Desarrollo",
-      "Interfaces",
-      "Landing pages",
-      "Tiendas y reservas",
-      "Rediseño",
+      "Apps y paneles",
+      "Kit Digital",
+      "Reservas y pagos",
+      "Contenido con IA",
     ];
 
     const step = 360 / items.length;
