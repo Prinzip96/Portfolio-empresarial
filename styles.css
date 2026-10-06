@@ -1152,7 +1152,7 @@ sup {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
   gap: clamp(14px, 1.8vw, 24px);
-  padding: 0 var(--pad);
+  padding: 0 var(--pad) clamp(44px, 6vw, 88px);
   align-items: stretch;
 }
 
