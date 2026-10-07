@@ -193,8 +193,9 @@ function start() {
     if (USE_POST) { rt.setSize(Math.round(vw * pr), Math.round(vh * pr)); post.material.uniforms.px.value = 3 * pr; }
     L.fit = Math.min(1, (hw * 2 * (mobile ? .48 : .3)) / 2.8, (hh * 2 * (mobile ? .34 : .52)) / 3);
     L.R = mobile ? Math.min(1.85, hw * 1.02) : Math.min(3.5, hw * .7);
-    L.s = mobile ? Math.min(.36, hw * .34 / 1.1) : Math.min(.74, hw * .2);
-    L.y = mobile ? -.86 : -.42; L.jy = mobile ? .18 : 0;
+    /* Pantallas un poco más arriba y pequeñas para no chocar con la placa */
+    L.s = mobile ? Math.min(.34, hw * .32 / 1.1) : Math.min(.62, hw * .175);
+    L.y = mobile ? -.62 : -.12; L.jy = mobile ? .18 : 0;
     L.hx = mobile ? hw * .46 : Math.min(2.2, hw * .3); L.hy = mobile ? hh * .46 : 0; L.hs = mobile ? .5 : 1;
     top = wrap.offsetTop; span = Math.max(1, wrap.offsetHeight - vh);
   }

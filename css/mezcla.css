@@ -31,33 +31,53 @@
 .orbit-plate {
   position: absolute;
   left: 50%;
-  bottom: clamp(20px, 3.4vw, 40px);
+  bottom: max(10px, env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
   display: grid;
-  grid-template-columns: auto 1fr auto auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: 22px;
-  width: min(760px, calc(100vw - 2 * var(--pad)));
-  padding: 16px 16px 16px 24px;
+  gap: 12px 16px;
+  width: min(560px, calc(100vw - 2 * var(--pad)));
+  padding: 8px 8px 8px 16px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: rgba(16,16,17,.72);
-  backdrop-filter: blur(14px) saturate(1.2);
-  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  background: rgba(12,12,13,.88);
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
   transition: border-color .4s ease;
 }
 .orbit-plate:hover { border-color: var(--accent); }
-.orbit-plate .case-index { font-size: 12px; color: var(--accent); letter-spacing: .08em; }
-.orbit-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.orbit-plate .case-name { font-family: var(--font-display); font-weight: 400; font-size: clamp(26px, 2.6vw, 38px); line-height: 1; letter-spacing: -.01em; }
-.orbit-plate .case-tags { font-size: 13px; color: var(--muted); }
-.orbit-plate .case-year { font-size: 13px; color: var(--muted); }
-.orbit-go { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 999px; background: var(--accent); color: #0a0a0a; font-size: 13px; font-weight: 500; white-space: nowrap; }
+.orbit-plate .case-index { font-size: 11px; color: var(--accent); letter-spacing: .08em; }
+.orbit-name { display: flex; flex-direction: column; gap: 0; min-width: 0; }
+.orbit-plate .case-name {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(18px, 1.8vw, 24px);
+  line-height: 1.1;
+  letter-spacing: -.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.orbit-plate .case-tags { display: none; }
+.orbit-plate .case-year { font-size: 12px; color: var(--muted); }
+.orbit-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #0a0a0a;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
 .orbit-go .arr { transition: transform .4s var(--ease); }
 .orbit-plate:hover .orbit-go .arr { transform: translateX(4px); }
 .orbit-plate.is-swap .orbit-name, .orbit-plate.is-swap .case-index { animation: orbit-swap .5s var(--ease); }
-@keyframes orbit-swap { from { opacity: 0; transform: translateY(10px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
-.orbit-hint { position: absolute; left: var(--pad); bottom: clamp(30px, 4vw, 52px); font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+@keyframes orbit-swap { from { opacity: 0; transform: translateY(8px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+.orbit-hint { position: absolute; left: var(--pad); bottom: 56px; font-size: 12px; color: var(--muted); letter-spacing: .04em; }
 .orbit-noscript { position: absolute; left: var(--pad); bottom: 24px; z-index: 4; color: var(--muted); font-size: 13px; }
 
 @media (max-width: 1100px) { .orbit-hint { display: none; } }
@@ -102,31 +122,25 @@
 
   .orbit-plate {
     grid-template-columns: auto minmax(0, 1fr) auto;
-    grid-template-rows: auto auto;
-    border-radius: 18px;
-    gap: 8px 12px;
-    padding: 14px 14px 14px 16px;
-    bottom: max(12px, env(safe-area-inset-bottom));
+    grid-template-rows: auto;
+    border-radius: 999px;
+    gap: 8px 10px;
+    padding: 7px 7px 7px 14px;
+    bottom: max(8px, env(safe-area-inset-bottom));
     width: calc(100vw - 2 * var(--pad));
     background: rgba(12,12,13,.92);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
-  .orbit-plate .case-index { grid-column: 1; grid-row: 1; align-self: center; }
+  .orbit-plate .case-index { grid-column: 1; grid-row: 1; }
   .orbit-name { grid-column: 2; grid-row: 1; min-width: 0; }
-  .orbit-plate .case-name {
-    font-size: clamp(22px, 6.2vw, 28px);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .orbit-plate .case-tags { display: none; }
-  .orbit-plate .case-year { grid-column: 3; grid-row: 1; align-self: center; }
+  .orbit-plate .case-name { font-size: clamp(16px, 4.6vw, 20px); }
+  .orbit-plate .case-year { display: none; }
   .orbit-go {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    justify-content: center;
-    padding: 11px 16px;
+    grid-column: 3;
+    grid-row: 1;
+    padding: 8px 12px;
+    font-size: 11px;
   }
 }
 
