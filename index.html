@@ -8,10 +8,9 @@
   <title>Jaime® · Webs, apps e IA</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="./favicon.svg" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/fonts.css" />
   <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./css/mezcla.css" />
 </head>
 <body>
   <div class="grain" aria-hidden="true"></div>
@@ -40,45 +39,66 @@
       <p>jaimesnchz9966@gmail.com</p>
     </div>
 
-    <!-- ——— Hero ——— -->
-    <section class="hero" id="top">
-      <div class="hero-glow" id="heroGlow" aria-hidden="true"></div>
-      <div class="hero-3d" id="hero3d" aria-hidden="true">
-        <canvas id="blob"></canvas>
-      </div>
+    <!-- ——— Escenario fijo: J06 cromada en el centro + anillo de trabajos ——— -->
+    <div class="jstage-wrap" id="jstageWrap">
+      <span class="jstage-anchor" id="trabajos" aria-hidden="true"></span>
+      <div class="jstage" id="stage">
+        <canvas id="gl" aria-hidden="true"></canvas>
 
-      <h1 class="hero-title">
-        <span class="line">
-          <span><span class="rotator" id="rotator">Auténtico</span><sup>®</sup></span>
-        </span>
-        <span class="line"><span>Portfolio <em>creativo</em></span></span>
-      </h1>
+        <section class="hero" id="top">
+          <div class="hero-glow" id="heroGlow" aria-hidden="true"></div>
 
-      <div class="hero-meta">
-        <div class="hero-meta-item">
-          <span class="label">Desde</span>
-          <span>Málaga · Trabajo en casa</span>
+          <h1 class="hero-title">
+            <span class="line">
+              <span><span class="rotator" id="rotator">Auténtico</span><sup>®</sup></span>
+            </span>
+            <span class="line"><span>Portfolio <em>creativo</em></span></span>
+          </h1>
+
+          <div class="hero-meta">
+            <div class="hero-meta-item">
+              <span class="label">Desde</span>
+              <span>Málaga · Trabajo en casa</span>
+            </div>
+            <div class="hero-meta-item">
+              <span class="label">Hago</span>
+              <span>Webs · Apps · Contenido con IA</span>
+            </div>
+            <div class="hero-meta-item">
+              <span class="label">Estado</span>
+              <span class="status">Disponible para proyectos</span>
+            </div>
+            <div class="hero-actions">
+              <button class="hero-talk talk magnetic" type="button" data-open-chat aria-label="Hablemos">
+                <span class="talk-label" data-alt="Respondo hoy"><span>Hablemos</span></span>
+                <span class="arr">→</span>
+              </button>
+              <button class="hero-scroll magnetic" id="scrollBtn" type="button">
+                <span>Ver trabajos</span>
+                <span class="arr">↓</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <div class="orbit-ui" id="orbitUI" aria-live="polite">
+          <div class="orbit-head">
+            <h2 class="section-title">Trabajos</h2>
+            <p class="work-hint">Primero los reales. Desliza y giran alrededor de la J</p>
+          </div>
+          <p class="orbit-count"><span id="ocount">01</span><span class="orbit-of">/ 05</span></p>
+          <ol class="orbit-pips" id="opips"><li></li><li></li><li></li><li></li><li></li></ol>
+          <a class="orbit-plate" id="oplate" href="./projects/mona.html">
+            <span class="case-index" id="oindex">01</span>
+            <span class="orbit-name"><span class="case-name" id="oname">Mona Real Estate</span><span class="case-tags" id="otags">Web · WordPress · Plugin a medida</span></span>
+            <span class="case-year" id="oyear">2026</span>
+            <span class="orbit-go" id="ogo">Ver proyecto <span class="arr">→</span></span>
+          </a>
+          <p class="orbit-hint">Clic en la pantalla para abrirla</p>
         </div>
-        <div class="hero-meta-item">
-          <span class="label">Hago</span>
-          <span>Webs · Apps · Contenido con IA</span>
-        </div>
-        <div class="hero-meta-item">
-          <span class="label">Estado</span>
-          <span class="status">Disponible para proyectos</span>
-        </div>
-        <div class="hero-actions">
-          <button class="hero-talk talk magnetic" type="button" data-open-chat aria-label="Hablemos">
-            <span class="talk-label" data-alt="Respondo hoy"><span>Hablemos</span></span>
-            <span class="arr">→</span>
-          </button>
-          <button class="hero-scroll magnetic" id="scrollBtn" type="button">
-            <span>Ver trabajos</span>
-            <span class="arr">↓</span>
-          </button>
-        </div>
+        <noscript><p class="orbit-noscript">monarealestate.es · kwsolutions.es · desbloque.com · prinzip96.github.io/PHOBIA · prinzip96.github.io/Distrito-4</p></noscript>
       </div>
-    </section>
+    </div>
 
     <!-- ——— Anillo 3D de servicios ——— -->
     <section class="ring" id="ring">
@@ -91,122 +111,6 @@
       </div>
     </section>
 
-    <!-- ——— Trabajos ——— -->
-    <section class="work" id="trabajos">
-      <div class="work-head">
-        <h2 class="section-title">Trabajos</h2>
-        <p class="work-hint">Primero los reales. Abajo, demos propias</p>
-      </div>
-
-      <!--
-        Para añadir o cambiar un proyecto, copia un bloque <a class="case"> y toca:
-          href       → la página de proceso (./projects/x.html) o la web directa
-          data-src   → la URL que se carga dentro de la ventana
-          data-tint  → color del proyecto (brillo al pasar por encima)
-          .case-url  → el texto que se lee en la barra de la ventana
-          .case-index / .case-name / .case-tags / .case-year
-        La ventana siempre enseña la web real en vivo: si la actualizas, aquí se
-        actualiza sola. Si una web se cae, el hueco sale en negro.
-      -->
-      <div class="cases" id="cases">
-        <a class="case reveal" href="./projects/mona.html" data-src="https://monarealestate.es" data-tint="#c9a227">
-          <div class="case-window">
-            <div class="case-bar">
-              <span class="case-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-              <span class="case-url">monarealestate.es</span>
-            </div>
-            <div class="case-media">
-              <div class="case-scroll"><iframe title="Mona Real Estate" tabindex="-1" loading="lazy"></iframe></div>
-              <span class="case-badge">Ver proyecto</span>
-            </div>
-          </div>
-          <div class="case-info">
-            <span class="case-index">01</span>
-            <h3 class="case-name">Mona Real Estate</h3>
-            <span class="case-tags">Web · WordPress · Plugin a medida</span>
-            <span class="case-year">2026</span>
-          </div>
-        </a>
-
-        <a class="case reveal" href="./projects/kw.html" data-src="https://kwsolutions.es" data-tint="#7ec8a3" data-poster="./projects/kw-preview.jpg">
-          <div class="case-window">
-            <div class="case-bar">
-              <span class="case-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-              <span class="case-url">kwsolutions.es</span>
-            </div>
-            <div class="case-media">
-              <div class="case-scroll"><iframe title="KW Solutions" tabindex="-1" loading="lazy"></iframe></div>
-              <span class="case-badge">Ver proyecto</span>
-            </div>
-          </div>
-          <div class="case-info">
-            <span class="case-index">02</span>
-            <h3 class="case-name">KW Solutions</h3>
-            <span class="case-tags">Web · WordPress · Plugin a medida</span>
-            <span class="case-year">2026</span>
-          </div>
-        </a>
-
-        <a class="case reveal" href="https://desbloque.com" target="_blank" rel="noopener noreferrer" data-src="https://desbloque.com" data-tint="#3dd6c6">
-          <div class="case-window">
-            <div class="case-bar">
-              <span class="case-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-              <span class="case-url">desbloque.com</span>
-            </div>
-            <div class="case-media">
-              <div class="case-scroll"><iframe title="Desbloque" tabindex="-1" loading="lazy"></iframe></div>
-              <span class="case-badge">Abrir web</span>
-            </div>
-          </div>
-          <div class="case-info">
-            <span class="case-index">03</span>
-            <h3 class="case-name">Desbloque</h3>
-            <span class="case-tags">Web · Producto · Proyecto real</span>
-            <span class="case-year">2026</span>
-          </div>
-        </a>
-
-        <a class="case reveal" href="https://prinzip96.github.io/PHOBIA/index.html" target="_blank" rel="noopener noreferrer" data-src="https://prinzip96.github.io/PHOBIA/index.html" data-tint="#ff4fd8">
-          <div class="case-window">
-            <div class="case-bar">
-              <span class="case-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-              <span class="case-url">prinzip96.github.io/PHOBIA</span>
-            </div>
-            <div class="case-media">
-              <div class="case-scroll"><iframe title="Phobia" tabindex="-1" loading="lazy"></iframe></div>
-              <span class="case-badge">Abrir web</span>
-            </div>
-          </div>
-          <div class="case-info">
-            <span class="case-index">04</span>
-            <h3 class="case-name">Phobia</h3>
-            <span class="case-tags">Web · Evento · Techno fest</span>
-            <span class="case-year">2025</span>
-          </div>
-        </a>
-
-        <a class="case reveal" href="https://prinzip96.github.io/Distrito-4/" target="_blank" rel="noopener noreferrer" data-src="https://prinzip96.github.io/Distrito-4/" data-tint="#d64545">
-          <div class="case-window">
-            <div class="case-bar">
-              <span class="case-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-              <span class="case-url">prinzip96.github.io/Distrito-4</span>
-            </div>
-            <div class="case-media">
-              <div class="case-scroll"><iframe title="Distrito 4" tabindex="-1" loading="lazy"></iframe></div>
-              <span class="case-badge">Abrir web</span>
-            </div>
-          </div>
-          <div class="case-info">
-            <span class="case-index">05</span>
-            <h3 class="case-name">Distrito 4</h3>
-            <span class="case-tags">Web · Hostelería · Reservas</span>
-            <span class="case-year">2025</span>
-          </div>
-        </a>
-      </div>
-    </section>
-
-    <!-- ——— Números ——— -->
     <!-- ——— Servicios ——— -->
     <section class="services" id="servicios">
       <div class="section-head">
@@ -923,9 +827,6 @@
   </div>
 
   <script src="./script.js"></script>
-  <script type="module" src="./blob.js"></script>
-  <script type="module" src="./wave.js"></script>
-  <script type="module" src="./dither.js"></script>
-  <script type="module" src="./ia.js"></script>
+  <script src="./js/app.js"></script>
 </body>
 </html>

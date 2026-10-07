@@ -1,4 +1,4 @@
-import * as THREE from "./vendor/three.module.js";
+import * as THREE from "three";
 import { snoise } from "./glsl-noise.js";
 
 const stage = document.getElementById("waveStage");

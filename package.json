@@ -1,10 +1,19 @@
 {
-  "name": "portfolio-jaime",
+  "name": "jaime-portfolio-mezcla",
   "private": true,
+  "version": "1.0.0",
+  "description": "Portfolio de Jaime Sánchez + escenario J06 3D con anillo de trabajos",
   "scripts": {
-    "start": "serve -l tcp://0.0.0.0:$PORT ."
+    "build": "esbuild src/app.js --bundle --minify --format=iife --target=es2020 --outfile=js/app.js",
+    "start": "serve -l tcp://0.0.0.0:$PORT .",
+    "serve": "npx --yes serve -l 8080 ."
   },
   "dependencies": {
-    "serve": "^14.2.5"
+    "serve": "^14.2.5",
+    "three": "^0.186.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "puppeteer-core": "^24.0.0"
   }
 }

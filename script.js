@@ -45,10 +45,14 @@
   /* ——— Botón flotante de contacto (móvil) ——— */
   const talkFloat = document.getElementById("talkFloat");
   const heroEl = document.getElementById("top");
+  const stageWrap = document.getElementById("jstageWrap");
   const contactEl = document.getElementById("contacto");
-  if (talkFloat && heroEl) {
+  if (talkFloat && (heroEl || stageWrap)) {
     scrollTasks.push(() => {
-      const pastHero = heroEl.getBoundingClientRect().bottom < 80;
+      // En la mezcla el hero vive dentro del sticky: usar el wrap de 720vh
+      const pastHero = stageWrap
+        ? stageWrap.getBoundingClientRect().bottom < window.innerHeight * 0.55
+        : heroEl.getBoundingClientRect().bottom < 80;
       const atContact = contactEl
         ? contactEl.getBoundingClientRect().top < window.innerHeight * 0.85
         : false;
@@ -595,7 +599,8 @@
     );
 
     document.addEventListener("pointerover", (e) => {
-      const row = e.target.closest(".case");
+      const row = e.target.closest(".case, .orbit-plate");
+      const pick3d = e.target.closest(".jstage.is-pick");
       const drag = e.target.closest(".ring-stage");
       const interactive = e.target.closest("a, button");
 
@@ -603,11 +608,12 @@
         if (row) {
           const goesOut = row.target === "_blank" || /^https?:/i.test(row.getAttribute("href") || "");
           cursorLabel.textContent = goesOut ? "Abrir" : "Ver";
-        } else if (drag) cursorLabel.textContent = "Gira";
+        } else if (pick3d) cursorLabel.textContent = "Ver";
+        else if (drag) cursorLabel.textContent = "Gira";
       }
 
-      cursor.classList.toggle("is-view", Boolean(row || drag));
-      cursor.classList.toggle("is-hover", Boolean(interactive) && !row && !drag);
+      cursor.classList.toggle("is-view", Boolean(row || pick3d || drag));
+      cursor.classList.toggle("is-hover", Boolean(interactive) && !row && !pick3d && !drag);
     });
 
     document.addEventListener("mouseleave", () => cursor.classList.remove("is-visible"));
