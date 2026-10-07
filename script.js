@@ -49,14 +49,15 @@
   const contactEl = document.getElementById("contacto");
   if (talkFloat && (heroEl || stageWrap)) {
     scrollTasks.push(() => {
-      // En la mezcla el hero vive dentro del sticky: usar el wrap de 720vh
+      // En la mezcla el hero vive dentro del sticky: usar el wrap largo
       const pastHero = stageWrap
         ? stageWrap.getBoundingClientRect().bottom < window.innerHeight * 0.55
         : heroEl.getBoundingClientRect().bottom < 80;
       const atContact = contactEl
         ? contactEl.getBoundingClientRect().top < window.innerHeight * 0.85
         : false;
-      talkFloat.classList.toggle("is-on", pastHero && !atContact);
+      const orbitOpen = document.body.classList.contains("orbit-open");
+      talkFloat.classList.toggle("is-on", pastHero && !atContact && !orbitOpen);
     });
   }
 

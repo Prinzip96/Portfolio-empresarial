@@ -7,6 +7,9 @@ import { SHOTS } from './shots.js';
 
 const CAPTURE = /[?&]capture/.test(location.search);
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const COARSE = matchMedia('(pointer: coarse)').matches;
+const NARROW = matchMedia('(max-width: 760px)').matches;
+const MOBILE = COARSE || NARROW;
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
@@ -22,9 +25,16 @@ if (wrap && canvas) start();
 
 function start() {
   let renderer;
-  try { renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: CAPTURE }); }
-  catch (e) { fallback(); return; }
-  renderer.setPixelRatio(Math.min(devicePixelRatio, CAPTURE ? 1.5 : 2));
+  try {
+    renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: !MOBILE,
+      alpha: true,
+      powerPreference: MOBILE ? 'low-power' : 'high-performance',
+      preserveDrawingBuffer: CAPTURE,
+    });
+  } catch (e) { fallback(); return; }
+  renderer.setPixelRatio(Math.min(devicePixelRatio, CAPTURE ? 1.5 : MOBILE ? 1.15 : 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -60,10 +70,14 @@ function start() {
   }
 
   /* ---- J06 ---- */
-  const chrome = new THREE.MeshPhysicalMaterial({ color: 0xf1f2ee, metalness: 1, roughness: .08, envMapIntensity: 1.5, clearcoat: .5, clearcoatRoughness: .06 });
+  const chrome = new THREE.MeshPhysicalMaterial({
+    color: 0xf1f2ee, metalness: 1, roughness: MOBILE ? .18 : .08, envMapIntensity: MOBILE ? 1.15 : 1.5,
+    clearcoat: MOBILE ? 0 : .5, clearcoatRoughness: .06,
+  });
   {
     const shapes = PIECES.map(pts => new THREE.Shape(pts.map(p => new THREE.Vector2(p[0], p[1]))));
-    let geo = new THREE.ExtrudeGeometry(shapes, { depth: 64, bevelEnabled: true, bevelThickness: 12, bevelSize: 6, bevelSegments: 6, curveSegments: 1 });
+    const bevelSeg = MOBILE ? 2 : 6;
+    let geo = new THREE.ExtrudeGeometry(shapes, { depth: 64, bevelEnabled: true, bevelThickness: 12, bevelSize: 6, bevelSegments: bevelSeg, curveSegments: 1 });
     geo.translate(0, 0, -32); geo.scale(S, S, S);
     J.add(new THREE.Mesh(toCreasedNormals(geo, Math.PI / 5), chrome));
   }
@@ -122,7 +136,8 @@ function start() {
   const ready = (async () => {
     await Promise.all(['italic 96px "Instrument Serif"', '20px Inter', '500 18px Inter'].map(f => document.fonts.load(f))).catch(() => {});
     const w = 2.2, h = w * TH / TW;
-    const bz = new RoundedBoxGeometry(w + .12, h + .12, .08, 4, .05), sc = new THREE.PlaneGeometry(w, h);
+    const seg = MOBILE ? 2 : 4;
+    const bz = new RoundedBoxGeometry(w + .12, h + .12, .08, seg, .05), sc = new THREE.PlaneGeometry(w, h);
     for (let i = 0; i < N; i++) {
       const [sharp, soft] = await textures(P[i]);
       const g = new THREE.Group(), cm = chrome.clone();
@@ -134,8 +149,9 @@ function start() {
   })();
   window.__ready = ready;
 
-  /* ---- post: dither 1 bit lima (solo en transiciones) ---- */
-  const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 });
+  /* ---- post: dither 1 bit lima (solo en transiciones; off en móvil) ---- */
+  const USE_POST = !MOBILE && !REDUCED;
+  const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: MOBILE ? 0 : 4 });
   const post = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
     uniforms: { t: { value: rt.texture }, amt: { value: 0 }, px: { value: 3 }, lime: { value: new THREE.Vector3(LIME.r, LIME.g, LIME.b) }, bone: { value: new THREE.Vector3(.957, .949, .933) } },
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy,0.,1.); }',
@@ -167,16 +183,19 @@ function start() {
   let vw = 1, vh = 1, hw = 1, hh = 1, mobile = false, top = 0, span = 1;
   const L = { fit: 1, R: 3, y: -.5, s: .7, hx: 0, hy: 0, hs: 1, jy: 0 };
   function measure() {
-    vw = stageEl.clientWidth; vh = stageEl.clientHeight; mobile = vw / vh < .85 || vw < 760;
-    camera.aspect = vw / vh; camera.position.set(0, mobile ? 1.6 : 2.5, 10); camera.lookAt(0, mobile ? .15 : 0, 0); camera.updateProjectionMatrix();
-    hh = Math.tan(THREE.MathUtils.degToRad(16)) * 10; hw = hh * camera.aspect;
+    vw = stageEl.clientWidth; vh = stageEl.clientHeight; mobile = vw / vh < .85 || vw < 760 || MOBILE;
+    camera.aspect = vw / vh;
+    camera.position.set(0, mobile ? 1.85 : 2.5, mobile ? 11.2 : 10);
+    camera.lookAt(0, mobile ? .05 : 0, 0); camera.updateProjectionMatrix();
+    hh = Math.tan(THREE.MathUtils.degToRad(16)) * (mobile ? 11.2 : 10); hw = hh * camera.aspect;
     renderer.setSize(vw, vh, false);
-    const pr = renderer.getPixelRatio(); rt.setSize(Math.round(vw * pr), Math.round(vh * pr)); post.material.uniforms.px.value = 3 * pr;
-    L.fit = Math.min(1, (hw * 2 * (mobile ? .56 : .3)) / 2.8, (hh * 2 * (mobile ? .4 : .52)) / 3);
-    L.R = mobile ? Math.min(2.1, hw * 1.15) : Math.min(3.5, hw * .7);
-    L.s = mobile ? Math.min(.5, hw * .42 / 1.1) : Math.min(.74, hw * .2);
-    L.y = mobile ? -.62 : -.42; L.jy = mobile ? .32 : 0;
-    L.hx = mobile ? hw * .42 : Math.min(2.2, hw * .3); L.hy = mobile ? hh * .38 : 0; L.hs = mobile ? .62 : 1;
+    const pr = renderer.getPixelRatio();
+    if (USE_POST) { rt.setSize(Math.round(vw * pr), Math.round(vh * pr)); post.material.uniforms.px.value = 3 * pr; }
+    L.fit = Math.min(1, (hw * 2 * (mobile ? .48 : .3)) / 2.8, (hh * 2 * (mobile ? .34 : .52)) / 3);
+    L.R = mobile ? Math.min(1.85, hw * 1.02) : Math.min(3.5, hw * .7);
+    L.s = mobile ? Math.min(.36, hw * .34 / 1.1) : Math.min(.74, hw * .2);
+    L.y = mobile ? -.86 : -.42; L.jy = mobile ? .18 : 0;
+    L.hx = mobile ? hw * .46 : Math.min(2.2, hw * .3); L.hy = mobile ? hh * .46 : 0; L.hs = mobile ? .5 : 1;
     top = wrap.offsetTop; span = Math.max(1, wrap.offsetHeight - vh);
   }
   addEventListener('resize', measure); addEventListener('load', measure);
@@ -209,7 +228,12 @@ function start() {
     const hit = ray.intersectObjects(items.map(it => it.screen), false)[0];
     return hit ? hit.object.userData.i : null;
   };
-  addEventListener('pointermove', e => { mx = e.clientX / innerWidth * 2 - 1; my = e.clientY / innerHeight * 2 - 1; stageEl.classList.toggle('is-pick', pick(e) !== null); }, { passive: true });
+  if (!COARSE) {
+    addEventListener('pointermove', e => {
+      mx = e.clientX / innerWidth * 2 - 1; my = e.clientY / innerHeight * 2 - 1;
+      stageEl.classList.toggle('is-pick', pick(e) !== null);
+    }, { passive: true });
+  }
   stageEl.addEventListener('click', e => {
     if (e.target.closest('a,button')) return;
     const i = pick(e); if (i === null) return;
@@ -217,31 +241,42 @@ function start() {
   });
 
   /* ---- bucle ---- */
-  let T = 0, sy = scrollY, last = performance.now(), visible = true;
+  let T = 0, sy = scrollY, last = performance.now(), visible = true, acc = 0;
+  const FRAME_MS = MOBILE ? 33 : 0; // ~30 fps en móvil
   if ('IntersectionObserver' in window) new IntersectionObserver(([en]) => { visible = en.isIntersecting; }).observe(stageEl);
   function frame(now) {
     requestAnimationFrame(frame);
-    const dt = Math.min(.05, Math.max(0, (now - last) / 1000)); last = now;
-    if (!visible) return;
+    const rawDt = Math.min(.05, Math.max(0, (now - last) / 1000));
+    if (!visible) { last = now; return; }
+    if (FRAME_MS) {
+      acc += (now - last);
+      if (acc < FRAME_MS) { last = now; return; }
+      acc %= FRAME_MS;
+    }
+    const dt = rawDt || FRAME_MS / 1000; last = now;
     T += dt;
-    sy = REDUCED ? scrollY : damp(sy, scrollY, 8, dt);
+    sy = REDUCED || MOBILE ? scrollY : damp(sy, scrollY, 8, dt);
     const p = clamp((sy - top) / span);
     const heroO = 1 - smooth(.02, .1, p);
     heroEl.style.opacity = heroO.toFixed(3);
-    heroEl.style.transform = `translateY(${(-50 * (1 - heroO)).toFixed(1)}px)`;
+    heroEl.style.transform = MOBILE ? 'none' : `translateY(${(-50 * (1 - heroO)).toFixed(1)}px)`;
     heroEl.style.visibility = heroO < .01 ? 'hidden' : 'visible';
+    heroEl.style.pointerEvents = heroO < .2 ? 'none' : '';
     const uiO = smooth(.2, .28, p);
-    orbitUI.style.opacity = uiO.toFixed(3); orbitUI.classList.toggle('is-on', uiO > .5);
-    smx = damp(smx, mx, 3, dt); smy = damp(smy, my, 3, dt);
-    const m = REDUCED ? 0 : 1;
-        const toC = 1 - ease(smooth(.03, .2, p));
+    orbitUI.style.opacity = uiO.toFixed(3);
+    const orbitOn = uiO > .5;
+    orbitUI.classList.toggle('is-on', orbitOn);
+    document.body.classList.toggle('orbit-open', orbitOn);
+    if (!MOBILE) { smx = damp(smx, mx, 3, dt); smy = damp(smy, my, 3, dt); }
+    const m = REDUCED || MOBILE ? 0 : 1;
+    const toC = 1 - ease(smooth(.03, .2, p));
     J.scale.setScalar(L.fit * lerp(1, L.hs, toC));
     J.position.set(L.hx * toC + smx * .06, lerp(L.jy, L.hy, toC) + Math.sin(T * .8) * .05 * m - smy * .05, 0);
     J.rotation.set(Math.sin(T * .37) * .07 * m + smy * .22, Math.sin(T * .5) * .3 * m + smx * .5, Math.sin(T * .3) * .03 * m);
-    const glint = Math.exp(-Math.pow(((T % 4.5) - .6) / .22, 2));
-    star.scale.setScalar(.55 * (.82 + .14 * Math.sin(T * 2.3) + glint * .6)); star.material.rotation = T * .25;
+    const glint = MOBILE ? 0 : Math.exp(-Math.pow(((T % 4.5) - .6) / .22, 2));
+    star.scale.setScalar(.55 * (.82 + .14 * Math.sin(T * 2.3) * m + glint * .6)); star.material.rotation = T * .25 * m;
     glow.material.opacity = .22 + glint * .45; streak.material.opacity = .4 + glint * .55; streak.scale.set(4.6 + glint * 1.8, .1 + glint * .05, 1);
-    scene.environmentRotation.set(0, T * .12 + smx * .4, 0);
+    if (!MOBILE) scene.environmentRotation.set(0, T * .12 + smx * .4, 0);
     if (items.length) {
       const A = ringAngle(p) - STEP * 1.5 * (1 - ease(smooth(.07, .3, p))) + smx * .06;
       let best = 0, bz = -1e9;
@@ -249,26 +284,31 @@ function start() {
         const e = ease(smooth(.07 + i * .028, .2 + i * .028, p));
         const th = i * STEP - A, rx = Math.sin(th) * L.R, rz = Math.cos(th) * L.R;
         const sx = it.side * (hw * 1.7 + 2.5);
-        it.g.position.set(lerp(sx, rx, e), lerp(L.y + .4, L.y, e) + Math.sin(T * .9 + i) * .03, lerp(2.2, rz, e));
-        it.g.rotation.set(0, lerp(-it.side * 1.1, Math.sin(th) * .55, e), 0);
-        it.g.visible = e > .001;
+        const bob = MOBILE ? 0 : Math.sin(T * .9 + i) * .03;
+        it.g.position.set(lerp(sx, rx, e), lerp(L.y + .4, L.y, e) + bob, lerp(2.2, rz, e));
+        it.g.rotation.set(0, lerp(-it.side * 1.1, Math.sin(th) * (MOBILE ? .35 : .55), e), 0);
         const d = (Math.cos(th) + 1) / 2, front = smooth(.86, 1, d) * smooth(.25, .3, p);
+        // En móvil solo se ven las pantallas cercanas al frente (menos overdraw)
+        it.g.visible = e > .001 && (!MOBILE || d > .22);
         it.g.scale.setScalar(L.s * (1 + .1 * front));
         it.mat.uniforms.dark.value = lerp(1, lerp(.08, 1, d * d), e);
-        it.mat.uniforms.blur.value = e * (1 - smooth(.55, .95, d));
+        it.mat.uniforms.blur.value = MOBILE ? e * (1 - smooth(.7, 1, d)) : e * (1 - smooth(.55, .95, d));
         it.mat.uniforms.lit.value = d;
-        it.cm.envMapIntensity = lerp(.2, 1.5, d * d); it.cm.color.setScalar(lerp(.4, 1, d));
+        it.cm.envMapIntensity = lerp(.2, MOBILE ? 1.1 : 1.5, d * d); it.cm.color.setScalar(lerp(.4, 1, d));
         if (rz > bz) { bz = rz; best = i; }
       });
       if (p > .2) setActive(best);
     }
-    // dither 1 bit: pico al formarse el anillo, un toque en cada giro y al soltar el escenario
-    const amt = REDUCED ? 0 : Math.max(Math.sin(Math.PI * smooth(.08, .27, p)) * .95, turning(p) * .42, smooth(.965, 1, p) * .9);
-    post.material.uniforms.amt.value = amt;
-    if (amt > .01) {
-      renderer.setRenderTarget(rt); renderer.setClearColor(0, 0); renderer.clear(); renderer.render(scene, camera);
-      renderer.setRenderTarget(null); renderer.clear(); renderer.render(postScene, postCam);
-    } else { renderer.setRenderTarget(null); renderer.render(scene, camera); }
+    if (USE_POST) {
+      const amt = Math.max(Math.sin(Math.PI * smooth(.08, .27, p)) * .95, turning(p) * .42, smooth(.965, 1, p) * .9);
+      post.material.uniforms.amt.value = amt;
+      if (amt > .01) {
+        renderer.setRenderTarget(rt); renderer.setClearColor(0, 0); renderer.clear(); renderer.render(scene, camera);
+        renderer.setRenderTarget(null); renderer.clear(); renderer.render(postScene, postCam);
+        return;
+      }
+    }
+    renderer.setRenderTarget(null); renderer.render(scene, camera);
   }
   measure();
   requestAnimationFrame(frame);
