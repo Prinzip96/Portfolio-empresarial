@@ -1,27 +1,43 @@
 /*
   Sección de IA.
   Cuatro escenas en el mismo canvas: ruido → imagen → vídeo → campaña.
-  El scroll las mezcla. Es literalmente el flujo: de no tener nada
-  a tener piezas que se pueden anunciarse.
+  En móvil: resolución baja, sin blend entre escenas y frames cacheados
+  (solo se pinta al cambiar de slide).
 */
 
 const section = document.getElementById("ia");
 const canvas = document.getElementById("iaCanvas");
-if (section && canvas) start(section, canvas);
+if (section && canvas) {
+  const boot = () => start(section, canvas);
+  if (!("IntersectionObserver" in window)) boot();
+  else {
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        boot();
+      },
+      { rootMargin: "200px 0px" }
+    );
+    io.observe(section);
+  }
+}
 
 function start(section, canvas) {
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const mobile =
     window.matchMedia("(max-width: 900px)").matches ||
     window.matchMedia("(pointer: coarse)").matches;
-  const ctx = canvas.getContext("2d", { alpha: true });
+  const ctx = canvas.getContext("2d", { alpha: true, desynchronized: true });
   if (!ctx) return;
 
   const slides = Array.from(document.querySelectorAll("#iaSlides .ia-slide"));
   const pips = Array.from(document.querySelectorAll("#iaPips li"));
   const indexEl = document.getElementById("iaIndex");
 
-  const PIXEL = mobile ? 8 : 5;
+  /* Móvil: píxeles gordos y canvas pequeño. Desktop un poco más fino. */
+  const PIXEL = mobile ? 14 : 5;
+  const MAX_DIM = mobile ? 48 : 120;
   const BAYER = [
     0, 32, 8, 40, 2, 34, 10, 42,
     48, 16, 56, 24, 50, 18, 58, 26,
@@ -38,13 +54,17 @@ function start(section, canvas) {
   let w = 0;
   let h = 0;
   let image = null;
+  const cache = mobile ? [null, null, null, null] : null;
 
+  let redrawAfterResize = null;
   const resize = () => {
-    w = Math.max(8, Math.min(140, Math.round((canvas.clientWidth || 1) / PIXEL)));
-    h = Math.max(8, Math.min(140, Math.round((canvas.clientHeight || 1) / PIXEL)));
+    w = Math.max(8, Math.min(MAX_DIM, Math.round((canvas.clientWidth || 1) / PIXEL)));
+    h = Math.max(8, Math.min(MAX_DIM, Math.round((canvas.clientHeight || 1) / PIXEL)));
     canvas.width = w;
     canvas.height = h;
     image = ctx.createImageData(w, h);
+    if (cache) cache.fill(null);
+    if (redrawAfterResize) redrawAfterResize();
   };
 
   resize();
@@ -55,23 +75,25 @@ function start(section, canvas) {
   let tmx = 0;
   let tmy = 0;
 
-  canvas.addEventListener(
-    "pointermove",
-    (e) => {
-      const rect = canvas.getBoundingClientRect();
-      tmx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      tmy = ((e.clientY - rect.top) / rect.height) * 2 - 1;
-    },
-    { passive: true }
-  );
-  canvas.addEventListener(
-    "pointerleave",
-    () => {
-      tmx = 0;
-      tmy = 0;
-    },
-    { passive: true }
-  );
+  if (!mobile) {
+    canvas.addEventListener(
+      "pointermove",
+      (e) => {
+        const rect = canvas.getBoundingClientRect();
+        tmx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        tmy = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+      },
+      { passive: true }
+    );
+    canvas.addEventListener(
+      "pointerleave",
+      () => {
+        tmx = 0;
+        tmy = 0;
+      },
+      { passive: true }
+    );
+  }
 
   const sdfBox = (px, py, cx, cy, hw, hh) => {
     const dx = Math.abs(px - cx) - hw;
@@ -81,9 +103,14 @@ function start(section, canvas) {
     return Math.min(Math.max(dx, dy), 0) + Math.hypot(ox, oy);
   };
 
-  /* 01 Ruido: un campo que se agita pero ya tiene centro */
   const ruido = (nx, ny, t) => {
     const d = Math.hypot(nx, ny);
+    if (mobile) {
+      const a = Math.sin(nx * 4.2 + ny * 2.6 + t);
+      let v = a * 0.5 + 0.42;
+      v *= Math.max(0, 1 - d * 0.5);
+      return v > 0.28 ? v : -v * 0.5;
+    }
     const a = Math.sin(nx * 5.4 + ny * 3.1 + t * 1.4);
     const b = Math.sin(nx * 2.1 - ny * 4.6 - t * 0.8);
     const c = Math.sin((nx + ny) * 7.2 + t * 2.1);
@@ -92,7 +119,6 @@ function start(section, canvas) {
     return v > 0.28 ? v : -v * 0.55;
   };
 
-  /* 02 Imagen: la bola dithered, la misma familia que Sobre mí */
   const imagen = (nx, ny, t) => {
     const radius = 0.72;
     const dx = nx / radius;
@@ -100,11 +126,16 @@ function start(section, canvas) {
     const r2 = dx * dx + dy * dy;
 
     if (r2 > 1) {
+      if (mobile) return -0.08 / (1 + (Math.sqrt(r2) - 1) * 1.4);
       const d = Math.sqrt(r2);
       return -((Math.sin(d * 4.2 - t * 1.1) * 0.5 + 0.5) * 0.28) / (1 + (d - 1) * 1.6);
     }
 
     const dz = Math.sqrt(1 - r2);
+    if (mobile) {
+      const light = dx * -0.35 + dy * -0.45 + dz * 0.74;
+      return light * 0.85 + (1 - dz) * 0.28;
+    }
     const lx = -0.4 + mx * 0.45;
     const ly = -0.5 + my * 0.4;
     const lz = 0.74;
@@ -115,34 +146,38 @@ function start(section, canvas) {
     return light * 0.7 + bands * 0.24 + rim * 0.32;
   };
 
-  /* 03 Vídeo: recuadro 16:9, scanlines y una barra de tiempo */
   const video = (nx, ny, t) => {
     const frame = sdfBox(nx, ny, 0, -0.04, 0.92, 0.54);
-    if (frame > 0.05) return ruido(nx, ny, t) * 0.12;
+    if (frame > 0.05) return mobile ? -0.04 : ruido(nx, ny, t) * 0.12;
     if (frame > 0) return 1;
 
+    if (mobile) {
+      const inner = imagen(nx * 0.95, ny * 1.2 + 0.04, t);
+      if (((ny * 12) | 0) % 2 === 0 && ny < 0.4) return inner * 0.55;
+      if (ny > 0.42 && ny < 0.5) {
+        const u = (nx + 0.9) / 1.8;
+        return u < 0.62 ? 1 : -0.2;
+      }
+      return inner;
+    }
+
     const inner = imagen(nx * 0.95, ny * 1.2 + 0.04, t * 1.35);
-    /* Scanlines finas, como un monitor, no persianas */
     const scan = Math.sin((ny + t * 0.55) * 18);
     if (scan > 0.93) return 0.2;
-
-    /* Barra de progreso abajo, como un reproductor */
     if (ny > 0.42 && ny < 0.5) {
       const u = (nx + 0.9) / 1.8;
       const playhead = (t * 0.12) % 1;
       return u < playhead ? 1 : -0.2;
     }
-
     return inner;
   };
 
-  /* 04 Campaña: seis piezas distintas, como creatividades en test */
   const campana = (nx, ny, t) => {
-    const cols = 3;
+    const cols = mobile ? 2 : 3;
     const rows = 2;
-    const cw = 0.5;
-    const ch = 0.4;
-    const gap = 0.07;
+    const cw = mobile ? 0.7 : 0.5;
+    const ch = mobile ? 0.48 : 0.4;
+    const gap = mobile ? 0.08 : 0.07;
     const totalW = cols * cw + (cols - 1) * gap;
     const totalH = rows * ch + (rows - 1) * gap;
     const x0 = -totalW / 2;
@@ -156,6 +191,11 @@ function start(section, canvas) {
         if (d < 0) {
           const u = (nx - cx) / (cw / 2);
           const v = (ny - cy) / (ch / 2);
+          if (mobile) {
+            /* En móvil no anida la esfera completa: gradiente barato por tarjeta */
+            const shade = 0.55 + u * 0.18 - v * 0.22 + ((c + r) & 1) * 0.12;
+            return shade;
+          }
           return imagen(u, v, t + c * 0.9 + r * 1.3) * 0.92;
         }
         if (d < 0.035) return 0.55;
@@ -165,6 +205,7 @@ function start(section, canvas) {
   };
 
   const SCENES = [ruido, imagen, video, campana];
+  const SCENE_T = [0.8, 1.4, 2.2, 3.1];
 
   let p = 0;
   let shown = -1;
@@ -181,41 +222,38 @@ function start(section, canvas) {
 
   const paintUi = () => {
     const active = Math.min(3, Math.floor(p * 3.999));
-    if (active === shown) return;
+    if (active === shown) return false;
     shown = active;
     slides.forEach((el, i) => el.classList.toggle("is-on", i === active));
     pips.forEach((el, i) => el.classList.toggle("is-on", i === active));
     if (indexEl) {
       indexEl.textContent = String(active + 1).padStart(2, "0") + " / 04";
     }
+    return true;
   };
 
-  const sample = (nx, ny, t) => {
-    const scaled = p * 3;
-    const i0 = Math.min(3, Math.floor(scaled));
-    const i1 = Math.min(3, i0 + 1);
-    let k = scaled - i0;
-    k = k * k * (3 - 2 * k);
-    const a = SCENES[i0](nx, ny, t);
-    if (k < 0.001) return a;
+  const sample = (nx, ny, t, sceneIndex, blend) => {
+    if (mobile || blend < 0.001) return SCENES[sceneIndex](nx, ny, t);
+    const i1 = Math.min(3, sceneIndex + 1);
+    const a = SCENES[sceneIndex](nx, ny, t);
     const b = SCENES[i1](nx, ny, t);
-    return a * (1 - k) + b * k;
+    return a * (1 - blend) + b * blend;
   };
 
-  const draw = (t) => {
-    if (!image) return;
-    const data = image.data;
+  const fillFrame = (target, sceneIndex, t, blend = 0) => {
+    const data = target.data;
     const half = Math.min(w, h) / 2;
     const cx = w / 2 + mx * w * 0.04;
     const cy = h / 2 + my * h * 0.04;
 
     for (let y = 0; y < h; y++) {
       const ny = (y - cy) / half;
+      const rowBayer = (y & 7) * 8;
       for (let x = 0; x < w; x++) {
         const nx = (x - cx) / half;
         const i = (y * w + x) * 4;
-        const bayer = (BAYER[(y & 7) * 8 + (x & 7)] + 0.5) / 64;
-        const v = sample(nx, ny, t);
+        const bayer = (BAYER[rowBayer + (x & 7)] + 0.5) / 64;
+        const v = sample(nx, ny, t, sceneIndex, blend);
 
         if (Math.abs(v) > bayer) {
           const c = v > 0 ? ON : DIM;
@@ -224,15 +262,35 @@ function start(section, canvas) {
           data[i + 2] = c[2];
           data[i + 3] = 255;
         } else {
+          data[i] = 0;
+          data[i + 1] = 0;
+          data[i + 2] = 0;
           data[i + 3] = 0;
         }
       }
     }
+  };
 
+  const drawScene = (sceneIndex) => {
+    if (!image) return;
+    if (cache) {
+      if (!cache[sceneIndex] || cache[sceneIndex].width !== w) {
+        const frame = ctx.createImageData(w, h);
+        fillFrame(frame, sceneIndex, SCENE_T[sceneIndex], 0);
+        cache[sceneIndex] = frame;
+      }
+      ctx.putImageData(cache[sceneIndex], 0, 0);
+      return;
+    }
+    const scaled = p * 3;
+    const i0 = Math.min(3, Math.floor(scaled));
+    let k = scaled - i0;
+    k = k * k * (3 - 2 * k);
+    fillFrame(image, i0, performance.now() / 1000, k);
     ctx.putImageData(image, 0, 0);
   };
 
-  let visible = true;
+  let visible = false;
   if ("IntersectionObserver" in window) {
     new IntersectionObserver(
       ([entry]) => {
@@ -240,6 +298,8 @@ function start(section, canvas) {
       },
       { threshold: 0 }
     ).observe(canvas);
+  } else {
+    visible = true;
   }
 
   measure();
@@ -248,23 +308,20 @@ function start(section, canvas) {
   if (reduceMotion) {
     p = 1;
     paintUi();
-    draw(1.4);
+    drawScene(3);
     return;
   }
 
-  draw(0);
-
-  /* En móvil no corre a 24 fps: solo redibuja cuando el scroll cambia de escena. */
+  /* Móvil: solo pinta al cambiar de escena (4 frames en total). */
   if (mobile) {
-    let lastP = -1;
     const onScroll = () => {
       if (!visible || document.hidden) return;
       measure();
-      paintUi();
-      const snapped = Math.round(p * 32);
-      if (snapped === lastP) return;
-      lastP = snapped;
-      draw(p * 8);
+      const changed = paintUi();
+      if (changed || !cache[shown]) drawScene(shown);
+    };
+    redrawAfterResize = () => {
+      if (shown >= 0) drawScene(shown);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
@@ -277,7 +334,7 @@ function start(section, canvas) {
   const frame = (now) => {
     requestAnimationFrame(frame);
     if (!visible || document.hidden) return;
-    if (now - last < 42) return;
+    if (now - last < 50) return; /* ~20 fps */
     last = now;
 
     mx += (tmx - mx) * 0.08;
@@ -285,7 +342,12 @@ function start(section, canvas) {
 
     measure();
     paintUi();
-    draw((now - t0) / 1000);
+    const scaled = p * 3;
+    const i0 = Math.min(3, Math.floor(scaled));
+    let k = scaled - i0;
+    k = k * k * (3 - 2 * k);
+    fillFrame(image, i0, (now - t0) / 1000, k);
+    ctx.putImageData(image, 0, 0);
   };
 
   requestAnimationFrame(frame);

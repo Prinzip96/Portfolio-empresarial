@@ -2991,17 +2991,24 @@ body.chat-open {
 
   /* En móvil el canvas va arriba y el texto debajo, sin overlay */
   .ia {
-    height: 320vh;
+    height: 220vh;
   }
 
   .ia-sticky {
     grid-template-columns: 1fr;
-    grid-template-rows: 38vh minmax(0, 1fr);
+    grid-template-rows: min(32vh, 260px) minmax(0, 1fr);
+    contain: layout paint;
   }
 
   .ia-stage {
     border-right: 0;
     border-bottom: 1px solid var(--line-soft);
+    contain: strict;
+  }
+
+  .ia-canvas {
+    cursor: default;
+    content-visibility: auto;
   }
 
   .ia-copy {
@@ -3017,6 +3024,11 @@ body.chat-open {
   .ia-slides {
     min-height: 124px;
     margin-top: 12px;
+  }
+
+  .ia-slide {
+    transition: opacity 0.35s ease;
+    transform: none;
   }
 
   .ia-foot {
