@@ -2449,6 +2449,45 @@ body.chat-open .talk-float {
   transform: translateY(0);
 }
 
+.chat-send:disabled {
+  opacity: 0.55;
+  cursor: wait;
+  pointer-events: none;
+}
+
+.chat-send.is-ok {
+  border-color: var(--accent);
+  color: #0a0a0a;
+}
+
+.chat-send.is-ok::before {
+  transform: translateY(0);
+}
+
+.chat-honey {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chat-status {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.chat-status.is-ok {
+  color: var(--accent);
+}
+
+.chat-status.is-err {
+  color: #ff8e8e;
+}
+
 .chat-prev {
   border: 0;
   background: transparent;

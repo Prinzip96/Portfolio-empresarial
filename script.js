@@ -418,9 +418,14 @@
     const who = document.getElementById("chatWho");
     const mailIn = document.getElementById("chatMail");
     const more = document.getElementById("chatMore");
+    const honey = document.getElementById("chatHoney");
+    const sendBtn = document.getElementById("chatSend");
+    const statusEl = document.getElementById("chatStatus");
+    const sendLabel = sendBtn?.querySelector("[data-label]");
     const answers = {};
     let step = 0;
     let opener = null;
+    let sending = false;
 
     const pad = (n) => String(n).padStart(2, "0");
 
@@ -481,11 +486,24 @@
       });
     });
 
-    form.addEventListener("submit", (e) => {
+    const setStatus = (text, kind) => {
+      if (!statusEl) return;
+      statusEl.hidden = !text;
+      statusEl.textContent = text || "";
+      statusEl.classList.toggle("is-ok", kind === "ok");
+      statusEl.classList.toggle("is-err", kind === "err");
+    };
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
+      if (sending) return;
+
+      // Honeypot relleno = bot
+      if (honey?.value) return;
 
       const name = who.value.trim();
       const email = mailIn ? mailIn.value.trim() : "";
+      const extra = more.value.trim();
       if (!name) {
         who.focus();
         return;
@@ -494,22 +512,83 @@
         mailIn?.focus();
         return;
       }
+      if (!answers[1] || !answers[2] || !answers[3]) {
+        setStatus("Vuelve atrás y elige las tres opciones.", "err");
+        return;
+      }
 
-      const body = [
+      const message = [
         `Hola Jaime, soy ${name}.`,
         `Mi correo: ${email}`,
         "",
-        `Necesito ${answers[1]}.`,
-        `Lo quiero ${answers[2]}.`,
-        `Sobre plazos: ${answers[3]}.`,
-        more.value.trim() ? `\n${more.value.trim()}` : "",
+        `Necesito: ${answers[1]}`,
+        `Uso: ${answers[2]}`,
+        `Plazos: ${answers[3]}`,
+        extra ? `\nMás info:\n${extra}` : "",
         "",
         `— Respóndeme a ${email}`,
-      ].join("\n");
+      ]
+        .filter(Boolean)
+        .join("\n");
 
-      window.location.href = `mailto:${MAIL}?subject=${encodeURIComponent(
-        `Proyecto — ${name}`
-      )}&body=${encodeURIComponent(body)}`;
+      sending = true;
+      sendBtn.disabled = true;
+      sendBtn.classList.remove("is-ok");
+      if (sendLabel) sendLabel.textContent = "Enviando…";
+      setStatus("Enviando a tu bandeja…", null);
+
+      try {
+        const res = await fetch(`https://formsubmit.co/ajax/${MAIL}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            message,
+            _subject: `Portfolio — ${name}: ${answers[1]}`,
+            _template: "table",
+            _captcha: "false",
+            _honey: honey?.value || "",
+            Necesito: answers[1],
+            Uso: answers[2],
+            Plazos: answers[3],
+          }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          throw new Error(data.message || "No se pudo enviar");
+        }
+
+        if (sendLabel) sendLabel.textContent = "Enviado";
+        sendBtn.classList.add("is-ok");
+        setStatus(
+          "Listo. Te escribo yo a tu correo. (Si es la primera vez, confirma el aviso que te llega a Gmail.)",
+          "ok"
+        );
+        form.reset();
+      } catch (err) {
+        if (sendLabel) sendLabel.textContent = "Enviar";
+        sendBtn.disabled = false;
+        setStatus(
+          "No salió por la red. Ábrelo en tu correo y mándalo desde ahí.",
+          "err"
+        );
+        // Fallback: mailto por si FormSubmit falla o está bloqueado
+        const mailto = `mailto:${MAIL}?subject=${encodeURIComponent(
+          `Proyecto — ${name}`
+        )}&body=${encodeURIComponent(message)}`;
+        window.location.href = mailto;
+      } finally {
+        sending = false;
+        if (!sendBtn.classList.contains("is-ok")) {
+          sendBtn.disabled = false;
+          if (sendLabel) sendLabel.textContent = "Enviar";
+        }
+      }
     });
   }
 
