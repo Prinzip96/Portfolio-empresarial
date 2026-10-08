@@ -3,14 +3,16 @@
 Es el portfolio actual (https://prinzip96.github.io/Portfolio-empresarial/), con su paleta, su tipografía y sus secciones y textos reales. El hero y la sección de trabajos se han sustituido por la J06 cromada en 3D, fija en el centro, con las 5 webs girando a su alrededor en un anillo al hacer scroll.
 
 ## Abrirlo en local
-- **Doble clic en `index.html`.** Funciona desde `file://` porque todo va empaquetado en `js/app.js`, y las capturas van embebidas.
-- **Con servidor local** (para probarlo en el móvil):
-  ```bash
-  cd web-mezcla
-  npm install
-  npm run serve
-  ```
-  Luego abre `http://localhost:8080`, o `http://IP-del-ordenador:8080` desde el móvil en la misma red.
+Necesita un servidor (módulos ES + capturas por URL):
+```bash
+npm install
+npm run serve
+```
+Abre `http://localhost:8080` (o `http://IP:8080` desde el móvil).
+
+```bash
+npm run build   # regenera js/ (app + chunks de Three/escena)
+```
 
 ## Deploy (Railway)
 Igual que el portfolio anterior: `npm start` sirve la carpeta en `$PORT` (`railway.toml`).
@@ -38,4 +40,4 @@ npm install
 npm run build        # genera js/app.js
 ```
 `tools/record.js` y `tools/shot.js` (con puppeteer-core) son los scripts con los que se grabaron el vídeo y las capturas.
-Las capturas viven en `assets/shots/*.jpg` y se embeben en `src/shots.js` al regenerar el bundle.
+Las capturas viven en `assets/shots/*.jpg` y se cargan por URL (no van en base64).

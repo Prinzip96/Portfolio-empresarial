@@ -131,15 +131,21 @@ function start() {
     const c = document.createElement('canvas'); c.width = TW; c.height = TH; const g = c.getContext('2d');
     const done = () => { bar(g, p.bar); const a = new THREE.CanvasTexture(c), b = new THREE.CanvasTexture(blurCopy(c)); for (const t of [a, b]) { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; } res([a, b]); };
     if (!SHOTS[p.key]) { placeholder(g); done(); return; }
-    const img = new Image(); img.onload = () => { g.drawImage(img, 0, BAR, TW, TH - BAR); done(); }; img.src = SHOTS[p.key];
+    const img = new Image();
+    img.decoding = 'async';
+    img.onload = () => { g.drawImage(img, 0, BAR, TW, TH - BAR); done(); };
+    img.onerror = () => { placeholder(g); done(); };
+    img.src = SHOTS[p.key];
   });
   const ready = (async () => {
     await Promise.all(['italic 96px "Instrument Serif"', '20px Inter', '500 18px Inter'].map(f => document.fonts.load(f))).catch(() => {});
     const w = 2.2, h = w * TH / TW;
     const seg = MOBILE ? 2 : 4;
     const bz = new RoundedBoxGeometry(w + .12, h + .12, .08, seg, .05), sc = new THREE.PlaneGeometry(w, h);
+    // Carga en serie en móvil para no saturar memoria/GPU de golpe
     for (let i = 0; i < N; i++) {
       const [sharp, soft] = await textures(P[i]);
+      if (MOBILE) { sharp.anisotropy = 1; soft.anisotropy = 1; }
       const g = new THREE.Group(), cm = chrome.clone();
       const mat = new THREE.ShaderMaterial({ uniforms: { sharp: { value: sharp }, soft: { value: soft }, blur: { value: 0 }, dark: { value: 1 }, lit: { value: 1 } }, vertexShader: VS, fragmentShader: FS });
       const screen = new THREE.Mesh(sc, mat); screen.position.z = .043; screen.userData.i = i;

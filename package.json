@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Portfolio de Jaime Sánchez + escenario J06 3D con anillo de trabajos",
   "scripts": {
-    "build": "esbuild src/app.js --bundle --minify --format=iife --target=es2020 --outfile=js/app.js",
+    "build": "esbuild src/app.js --bundle --minify --splitting --format=esm --target=es2020 --outdir=js --entry-names=app --chunk-names=chunk-[hash]",
     "start": "serve -l tcp://0.0.0.0:$PORT .",
     "serve": "npx --yes serve -l 8080 ."
   },
