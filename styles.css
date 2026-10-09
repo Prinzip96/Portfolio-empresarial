@@ -3036,18 +3036,21 @@ body.chat-open {
   .ia-sticky {
     grid-template-columns: 1fr;
     grid-template-rows: min(32vh, 260px) minmax(0, 1fr);
-    contain: layout paint;
+    contain: layout;
   }
 
   .ia-stage {
     border-right: 0;
     border-bottom: 1px solid var(--line-soft);
-    contain: strict;
+    contain: layout paint;
+    will-change: auto;
   }
 
   .ia-canvas {
     cursor: default;
-    content-visibility: auto;
+    touch-action: pan-y;
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   .ia-copy {
