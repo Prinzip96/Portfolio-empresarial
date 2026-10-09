@@ -28,8 +28,15 @@ function start(section, canvas) {
   const mobile =
     window.matchMedia("(max-width: 900px)").matches ||
     window.matchMedia("(pointer: coarse)").matches;
-  const ctx = canvas.getContext("2d", { alpha: true, desynchronized: true });
+  const ctx = canvas.getContext("2d", { alpha: true, desynchronized: true, willReadFrequently: mobile });
   if (!ctx) return;
+
+  canvas.addEventListener("webglcontextlost", (e) => {
+    e.preventDefault();
+  }, false);
+  canvas.addEventListener("contextlost", (e) => {
+    e.preventDefault();
+  }, false);
 
   const slides = Array.from(document.querySelectorAll("#iaSlides .ia-slide"));
   const pips = Array.from(document.querySelectorAll("#iaPips li"));
@@ -64,11 +71,25 @@ function start(section, canvas) {
     canvas.height = h;
     image = ctx.createImageData(w, h);
     if (cache) cache.fill(null);
-    if (redrawAfterResize) redrawAfterResize();
+    if (redrawAfterResize) {
+      if (mobile) {
+        requestAnimationFrame(() => redrawAfterResize());
+      } else {
+        redrawAfterResize();
+      }
+    }
   };
 
   resize();
-  new ResizeObserver(resize).observe(canvas);
+  const resizeObserver = new ResizeObserver(resize);
+  resizeObserver.observe(canvas);
+  
+  if (mobile) {
+    window.addEventListener("pagehide", () => {
+      resizeObserver.disconnect();
+      if (cache) cache.fill(null);
+    }, { once: true });
+  }
 
   let mx = 0;
   let my = 0;
@@ -272,14 +293,19 @@ function start(section, canvas) {
   };
 
   const drawScene = (sceneIndex) => {
-    if (!image) return;
+    if (!image || !ctx) return;
+    if (mobile && (!visible || document.hidden)) return;
     if (cache) {
       if (!cache[sceneIndex] || cache[sceneIndex].width !== w) {
         const frame = ctx.createImageData(w, h);
         fillFrame(frame, sceneIndex, SCENE_T[sceneIndex], 0);
         cache[sceneIndex] = frame;
       }
-      ctx.putImageData(cache[sceneIndex], 0, 0);
+      try {
+        ctx.putImageData(cache[sceneIndex], 0, 0);
+      } catch (e) {
+        console.warn("Canvas paint error:", e);
+      }
       return;
     }
     const scaled = p * 3;
@@ -287,7 +313,11 @@ function start(section, canvas) {
     let k = scaled - i0;
     k = k * k * (3 - 2 * k);
     fillFrame(image, i0, performance.now() / 1000, k);
-    ctx.putImageData(image, 0, 0);
+    try {
+      ctx.putImageData(image, 0, 0);
+    } catch (e) {
+      console.warn("Canvas paint error:", e);
+    }
   };
 
   let visible = false;
@@ -295,6 +325,9 @@ function start(section, canvas) {
     new IntersectionObserver(
       ([entry]) => {
         visible = entry.isIntersecting;
+        if (reduceMotion && visible && shown >= 0) {
+          drawScene(shown);
+        }
       },
       { threshold: 0 }
     ).observe(canvas);
@@ -308,14 +341,21 @@ function start(section, canvas) {
   if (reduceMotion) {
     p = 1;
     paintUi();
-    drawScene(3);
+    if (visible) {
+      drawScene(3);
+    }
     return;
   }
 
   /* Móvil: solo pinta al cambiar de escena (4 frames en total). */
   if (mobile) {
+    let scrollTimeout = null;
     const onScroll = () => {
       if (!visible || document.hidden) return;
+      if (scrollTimeout) return;
+      scrollTimeout = setTimeout(() => {
+        scrollTimeout = null;
+      }, 16);
       measure();
       const changed = paintUi();
       if (changed || !cache[shown]) drawScene(shown);
@@ -324,15 +364,21 @@ function start(section, canvas) {
       if (shown >= 0) drawScene(shown);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
+    document.addEventListener("touchmove", (e) => {
+      if (e.target.closest(".ia-stage")) {
+        e.stopPropagation();
+      }
+    }, { passive: true });
     onScroll();
     return;
   }
 
   const t0 = performance.now();
   let last = 0;
+  let rafId = null;
 
   const frame = (now) => {
-    requestAnimationFrame(frame);
+    rafId = requestAnimationFrame(frame);
     if (!visible || document.hidden) return;
     if (now - last < 50) return; /* ~20 fps */
     last = now;
@@ -347,8 +393,16 @@ function start(section, canvas) {
     let k = scaled - i0;
     k = k * k * (3 - 2 * k);
     fillFrame(image, i0, (now - t0) / 1000, k);
-    ctx.putImageData(image, 0, 0);
+    try {
+      ctx.putImageData(image, 0, 0);
+    } catch (e) {
+      console.warn("Canvas paint error:", e);
+    }
   };
 
-  requestAnimationFrame(frame);
+  rafId = requestAnimationFrame(frame);
+  
+  window.addEventListener("pagehide", () => {
+    if (rafId) cancelAnimationFrame(rafId);
+  }, { once: true });
 }
