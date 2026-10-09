@@ -3034,8 +3034,10 @@ body.chat-open {
   }
 
   .ia-sticky {
+    top: 64px;
+    height: calc(100dvh - 64px);
     grid-template-columns: 1fr;
-    grid-template-rows: min(32vh, 260px) minmax(0, 1fr);
+    grid-template-rows: min(48dvh, 420px) minmax(0, 1fr);
     contain: layout;
   }
 
@@ -3054,8 +3056,8 @@ body.chat-open {
   }
 
   .ia-copy {
-    padding: 22px var(--pad) 28px;
-    justify-content: flex-start;
+    padding: 28px var(--pad) 32px;
+    justify-content: space-between;
   }
 
   .ia-index {
