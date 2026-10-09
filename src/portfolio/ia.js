@@ -114,10 +114,6 @@ function start(section, canvas) {
       },
       { passive: true }
     );
-  } else {
-    canvas.addEventListener("touchstart", (e) => {
-      e.preventDefault();
-    }, { passive: false });
   }
 
   const sdfBox = (px, py, cx, cy, hw, hh) => {
@@ -329,6 +325,9 @@ function start(section, canvas) {
     new IntersectionObserver(
       ([entry]) => {
         visible = entry.isIntersecting;
+        if (reduceMotion && visible && shown >= 0) {
+          drawScene(shown);
+        }
       },
       { threshold: 0 }
     ).observe(canvas);
@@ -342,7 +341,9 @@ function start(section, canvas) {
   if (reduceMotion) {
     p = 1;
     paintUi();
-    drawScene(3);
+    if (visible) {
+      drawScene(3);
+    }
     return;
   }
 
